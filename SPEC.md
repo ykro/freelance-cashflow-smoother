@@ -1,62 +1,67 @@
 # 📋 Especificación del Proyecto: Freelance Cashflow Smoother
 
-**Objetivo:** Construir en **1 semana (formato Hackathon)** una aplicación financiera para trabajadores informales y freelancers que analice la volatilidad de sus ingresos, identifique temporadas altas y bajas, y calcule una **cuota semanal dinámica de ahorro/reserva** para garantizar liquidez todo el año.
+**Objetivo:** Construir en **1 semana (formato Hackathon)** un dashboard sumamente visual y fácil de consumir para trabajadores informales y freelancers que transforme ingresos impredecibles en una cuota semanal clara de ahorro y un "sueldo propio estabilizado".
 
 ---
 
-## 1. Alcance del MVP (Qué entra y qué NO entra en 1 semana)
+## 1. Definición Exacta de INPUTS y OUTPUTS
 
-### ✅ In-Scope (Lo que sí construiremos)
-1. **Onboarding Ultra-Rápido de Ingresos y Gastos Base:**
-   - Opción A: Subir un CSV/Excel simple o seleccionar uno de 3 perfiles pre-cargados (ej. *Diseñador Freelance*, *Comerciante / Vendedor por Comisión*, *Conductor de App / Repartidor*).
-   - Opción B: Ingreso rápido de sus gastos fijos mensuales indispensables ("Piso de Vida": renta, comida, servicios) y sus ingresos de los últimos 6 meses.
-2. **Detector de Meses Buenos y Malos (Seasonal Profiling):**
-   - Clasifica automáticamente cada mes histórico en **Temporada Alta (Feast)**, **Normal**, o **Temporada Baja (Famine)** según la desviación respecto a su media móvil y su piso de gastos.
-3. **Calculadora Semanal "Cuánto Apartar Hoy" (Waterfall Buffer Algorithm):**
-   - El usuario ingresa cuánto ganó esta semana.
-   - El algoritmo calcula al instante la división en 3 cubetas:
-     1. 🛡️ **Apartado para Temporada Baja** (monto exacto en $ y % a guardar).
-     2. 🏠 **Cuota para Gastos Fijos del Mes**.
-     3. ✨ **Libre para Gastar esta Semana (Tu "Sueldo Semanal")**.
-4. **Simulador "Qué Pasa Si..." (Stress Test):**
-   - Un slider interactivo donde el usuario prueba: *"¿Qué pasa si mis próximas 4 semanas son malas (ingreso cae 50%)?"* y ve cómo su fondo colchón absorbe el golpe sin dejarlo en cero.
+### 📥 INPUTS (Qué entra al sistema)
 
-### ❌ Out-of-Scope (Para evitar retrasos en la semana)
-- Transferencias bancarias reales o creación de cuentas custodia reguladas (fintech banking real).
-- Contabilidad fiscal compleja multi-país (impuestos se manejan como un porcentaje configurable simple opcional).
+| Tipo de Input | Campos Exactos | Cómo lo ingresa el usuario (UX sin fricción) |
+| :--- | :--- | :--- |
+| **1. Configuración Base (1 sola vez)** | • `monthly_floor` (Piso de gastos básicos al mes)<br>• `current_buffer` (Ahorro/colchón actual) | 3 sliders rápidos o calculadora visual de 4 rubros (Vivienda, Comida, Servicios, Transporte/Trabajo). |
+| **2. Historial de Estacionalidad** | • Serie de los últimos 6 a 12 meses de ingresos `[{ month, income }]` **O**<br>• Rango rápido (`good_month_avg`, `bad_month_avg`, `low_season_months[]`) | • **Botón 1-Click Demo** (3 perfiles reales pre-cargados)<br>• **Subida de CSV / Estado de cuenta**<br>• **Dictado o texto natural** procesado por `gemma-4-e2b` / `gemini-3.8-flash` (*"En diciembre gano como 35 mil, pero en enero y febrero bajo a 10 mil"*). |
+| **3. Check-in Semanal (El corazón del uso)** | • `weekly_income` (Ingreso bruto de esta semana) | Un input numérico grande o slider en la parte superior del dashboard: *"¿Cuánto ingresó esta semana?"* |
 
 ---
 
-## 2. El Algoritmo ("Waterfall Cashflow Smoothing")
+### 📊 OUTPUTS (Qué muestra el Dashboard para consumirse en 5 segundos)
 
-Para que sea sólido pero implementable en un hackathon, usamos un modelo determinista transparente apoyado por IA para explicaciones:
+1. **Tarjeta Principal: "Tu Reparto de Esta Semana" (Acción Inmediata)**
+   - **🛡️ Monto Exacto a Apartar (`save_for_low_season`):** Ej. **`$1,450 MXN (29%)`** → *"Guárdalo hoy en tu apartado de temporada baja"*.
+   - **🏠 Reserva para Gastos Fijos (`fixed_cost_allocation`):** Ej. **`$2,500 MXN (50%)`** → *"Para renta, despensa y servicios de esta semana"*.
+   - **✨ Tu Sueldo Libre Seguro (`safe_to_spend`):** Ej. **`$1,050 MXN (21%)`** → *"Gástalo con total tranquilidad"*.
+   - *(Si la semana fue mala y ganó menos de `$2,500`, el output cambia automáticamente a color ámbar/azul: **"Esta semana apartas $0. Retira $600 de tu Fondo Colchón para completar tus gastos fijos sin endeudarte"**).*
 
-### Variables Clave
-- $F_{mes}$: Gastos fijos mensuales indispensables (*Floor* o Piso de Vida).
-- $F_{sem} = F_{mes} / 4.33$: Costo mínimo semanal para vivir.
-- $\mu_{sem}$ y $\sigma_{sem}$: Promedio y desviación estándar del ingreso semanal histórico.
-- $CV = \sigma_{sem} / \mu_{sem}$: Coeficiente de variación (qué tan inestable es el trabajador).
-- $M_{meta} = F_{sem} \times \text{Semanas de Temporada Baja Esperadas}$: Meta del Fondo de Estabilización (típicamente entre 4 y 12 semanas según su $CV$).
+2. **KPI Cards Superiores (Salud del Colchón)**
+   - **Semanas de Oxígeno (Runway):** `Fondo Actual / Piso Semanal` (ej. **5.2 semanas** blindadas).
+   - **Estado del Fondo vs. Meta para Próxima Temporada Baja:** Barra de progreso (ej. `$13,000 / $15,000` antes de que llegue Enero).
+   - **Índice de Volatilidad Personal:** Bajo / Medio / Alto (basado en su Coeficiente de Variación $CV$).
 
-### Regla de Decisión Semanal (Dado el ingreso de esta semana $I_t$)
-1. **Semana Buena ($I_t > \mu_{sem}$ o $I_t > 1.2 \times F_{sem}$):**
-   - Primero se cubre $F_{sem}$ (Gastos base).
-   - Del excedente $(I_t - F_{sem})$, se aparta una fracción progresiva $\alpha \in [30\%, 70\%]$ hacia el **Fondo de Temporada Baja**, ponderada por qué tan lleno está el fondo actual ($B_{actual} / M_{meta}$) y qué tan cerca está su próximo "mes malo" histórico.
-2. **Semana Normal ($F_{sem} \le I_t \le 1.2 \times F_{sem}$):**
-   - Se cubre $F_{sem}$ y se aparta un micro-ahorro base (10%–15% del excedente).
-3. **Semana Mala ($I_t < F_{sem}$):**
-   - **Apartado = $0**.
-   - El sistema indica **cuánto retirar del Fondo de Temporada Baja** ($\text{Retiro} = F_{sem} - I_t$) para que el trabajador complete su semana sin endeudarse.
+3. **Gráfica Interactiva Principal: "La Montaña Rusa vs. Tu Sueldo Estabilizado"**
+   - Línea punteada naranja: Ingresos reales semana a semana (picos altos y caídas bruscas).
+   - Área sólida verde: El ingreso disponible estabilizado gracias al algoritmo *Waterfall Buffer*.
 
-```mermaid
-flowchart TD
-    A["💵 Ingreso de la Semana (I_t)"] --> B{"¿Cómo estuvo la semana vs tu Piso (F_sem)?"}
-    B -->|Semana Buena: Superávit| C["1. Cubrir Piso Semanal (F_sem)"]
-    C --> D["2. Apartar % Dinámico al Fondo Temporada Baja"]
-    D --> E["3. Sueldo Libre Seguro para ti"]
-    B -->|Semana Mala: Déficit| F["Apartar $0 esta semana"]
-    F --> G["🔄 Retirar exacto del Fondo Colchón (F_sem - I_t)"]
-```
+4. **Mapa Estacional de 12 Meses + Coach IA (`gemini-3.8-flash`)**
+   - Tira visual de Enero a Diciembre marcando con ☀️ los meses históricamente fuertes (momento de llenar el colchón) y con 🌧️ los meses flojos (momento donde el colchón te paga tu sueldo).
+   - Resumen ejecutivo de 3 puntos generado por `gemini-3.8-flash` explicando por qué se sugiere apartar ese monto esta semana.
+
+---
+
+## 2. Algoritmo Matemático ("Waterfall Buffer") + Rol de IA
+
+### Cálculo Determinista
+Sea:
+- $F_{sem} = \text{Piso Mensual} / 4.33$
+- $B_{meta} = F_{sem} \times N_{\text{semanas\_bajas}}$ (donde $N_{\text{semanas\_bajas}}$ se infiere de cuántos meses históricos estuvieron por debajo de $F_{mes}$, mínimo 4 semanas).
+- Déficit del fondo: $D = \max(0, B_{meta} - B_{actual})$.
+- Semanas restantes hasta el próximo mes malo: $W_{\text{prox}}$.
+
+Cuando entra el ingreso semanal $I_t$:
+- **Caso 1: Semana con Déficit ($I_t < F_{sem}$)**
+  - $\text{Apartado} = 0$
+  - $\text{Retiro del Colchón} = \min(B_{actual}, F_{sem} - I_t)$
+  - $\text{Sueldo Disponible} = I_t + \text{Retiro del Colchón}$
+- **Caso 2: Semana con Superávit ($I_t \ge F_{sem}$)**
+  - Excedente $E_t = I_t - F_{sem}$
+  - Cuota ideal para llegar a la meta antes de la temporada baja: $C_{\text{ideal}} = D / \max(1, W_{\text{prox}})$
+  - $\text{Apartado} = \min(E_t \times 0.75, \max(E_t \times 0.25, C_{\text{ideal}}))$
+  - $\text{Sueldo Libre Seguro} = E_t - \text{Apartado}$
+
+### Rol de `gemini-3.8-flash` y `gemma-4-e2b`
+- **`gemini-3.8-flash`:** Analiza la serie histórica del trabajador, detecta patrones estacionales sutiles, redacta la estrategia personalizada para los próximos 3 meses y responde al simulador *"¿Qué pasa si...?"*.
+- **`gemma-4-e2b`:** Permite que un trabajador informal escriba o dicte en lenguaje coloquial sus ingresos/gastos (ej. *"de renta son 4 mil, de luz y gas 800, y en meses buenos saco 5 mil a la semana pero en lluvias baja a 2 mil"*) y los convierta instantáneamente en los parámetros estructurados del dashboard.
 
 ---
 
@@ -64,17 +69,10 @@ flowchart TD
 
 | Día | Meta Principal | Entregable |
 | :--- | :--- | :--- |
-| **Día 1** | Motor del Algoritmo & Datasets Sintéticos | Función en TypeScript/Python con el cálculo del *Waterfall Buffer* + 3 datasets realistas de 12 meses (Freelancer, Comerciante informal, Conductor de app). |
-| **Día 2** | UI Principal: "Mi Semana" + Calculadora de Apartado | Pantalla donde el usuario mete cuánto ganó esta semana y ve con barras claras cuánto apartar hoy y su "Sueldo Seguro". |
-| **Día 3** | Gráfica "Montaña Rusa vs. Sueldo Estabilizado" | Gráfica dual en Recharts que muestra la línea roja (ingresos reales volátiles) vs. la línea verde (su flujo estabilizado gracias al fondo colchón). |
-| **Día 4** | Mapa de Calor de Meses Buenos y Malos + IA Coach | Calendario anual identificando meses críticos históricos y recomendaciones en lenguaje natural (ej. *"Octubre suele ser tu mes más fuerte; apartando $850/semana llegarás blindado a Enero"*). |
-| **Día 5** | Simulador de Crisis ("Stress Test") | Slider interactivo para simular una racha de 3–6 semanas malas y mostrar el indicador de *Semanas de Oxígeno (Runway)*. |
-| **Día 6** | Pulido Mobile-First y Recordatorio Semanal | Diseño adaptable a celular (fundamental para trabajadores informales) + simulación de notificación por WhatsApp/Web ("¡Viernes de cierre! ¿Cuánto ingresó esta semana?"). |
-| **Día 7** | Demo y Pitch | Comparativa visual del antes (quedarse en $0 en temporada baja) y después (paz mental todo el año). |
-
----
-
-## 4. Qué hace ganador a este proyecto en un Hackathon
-1. **Impacto Social y Financiero Real:** Ataca a un segmento enorme e ignorado por la banca tradicional (economía informal y gig workers en LATAM).
-2. **Acción Concreta Semanal:** No abruma con 50 categorías contables; responde una sola pregunta vital cada viernes: *"De lo que gané esta semana, ¿cuánto guardo y cuánto puedo gastar sin miedo?"*
-3. **Visualización "Antes vs. Después":** La gráfica que aplana la curva de ingresos volátiles vende el proyecto en 5 segundos ante el jurado.
+| **Día 1** | Motor Matemático *Waterfall Buffer* + Perfiles Demo | Módulo TypeScript probado con tests unitarios + 3 perfiles realistas (Freelancer, Comerciante, Conductor). |
+| **Día 2** | Dashboard Principal (3 Cubetas + KPIs de Oxígeno) | Interfaz limpia donde al mover el slider de "Ingreso de esta semana" se recalculan en vivo las 3 cubetas. |
+| **Día 3** | Gráfica "Montaña Rusa vs. Sueldo Estabilizado" | Visualización en Recharts + Mapa Estacional de 12 meses (Meses Buenos vs. Meses Malos). |
+| **Día 4** | Integración `gemini-3.8-flash` y `gemma-4-e2b` | Onboarding en lenguaje natural (texto a parámetros) + Coach IA explicando la estrategia de temporada baja. |
+| **Día 5** | Simulador de Crisis ("Stress Test") | Controles interactivos para simular caída de ingresos y ver cuántas semanas aguanta el fondo colchón. |
+| **Día 6** | Pulido Visual y Deploy en Vercel / Cloud Run | Optimización Mobile-First y despliegue público con URL lista. |
+| **Día 7** | Pruebas A/B y Documentación en Repo de Argon | Registro de métricas, capturas y comparativas en `gemini-argon-agy-benchmark`. |
