@@ -44,22 +44,21 @@ export default function CashflowChart({
     smoothedDisplay: convert(point.smoothedIncome),
     floorDisplay: convert(monthlyFloor),
     stressedDisplay: convert(point.stressedIncome),
-    bufferDisplay: convert(point.projectedBufferBalance),
   }));
 
   const symbol = currency === "GTQ" ? "Q" : "$";
 
   return (
-    <div className="w-full h-[330px]">
+    <div className="w-full h-[300px]">
       <ResponsiveContainer width="100%" height="100%">
         <ComposedChart
           data={chartData}
-          margin={{ top: 14, right: 18, left: 6, bottom: 4 }}
+          margin={{ top: 10, right: 12, left: 0, bottom: 0 }}
         >
           <defs>
             <linearGradient id="smoothedGradient" x1="0" y1="0" x2="0" y2="1">
-              <stop offset="5%" stopColor="#059669" stopOpacity={0.28} />
-              <stop offset="95%" stopColor="#059669" stopOpacity={0.03} />
+              <stop offset="5%" stopColor="#059669" stopOpacity={0.22} />
+              <stop offset="95%" stopColor="#059669" stopOpacity={0.02} />
             </linearGradient>
           </defs>
           <CartesianGrid
@@ -69,9 +68,9 @@ export default function CashflowChart({
           />
           <XAxis
             dataKey="shortName"
-            axisLine={{ stroke: "#cbd5e1" }}
+            axisLine={{ stroke: "#e2e8f0" }}
             tickLine={false}
-            tick={{ fill: "#475569", fontSize: 12, fontWeight: 500 }}
+            tick={{ fill: "#64748b", fontSize: 12, fontWeight: 500 }}
           />
           <YAxis
             axisLine={false}
@@ -89,45 +88,41 @@ export default function CashflowChart({
               const isLow = row.classification === "BAJA";
 
               return (
-                <div className="bg-white border border-slate-200 rounded-xl shadow-lg p-3.5 text-xs min-w-[230px]">
+                <div className="bg-white border border-slate-200 rounded-xl shadow-md p-3 text-xs min-w-[210px]">
                   <div className="flex items-center justify-between border-b border-slate-100 pb-2 mb-2">
-                    <span className="font-bold text-slate-900 text-sm">
+                    <span className="font-semibold text-slate-900">
                       {row.monthName}
                     </span>
                     <span
-                      className={`px-2 py-0.5 rounded-full font-semibold text-[11px] ${
+                      className={`px-2 py-0.5 rounded-full font-medium text-[11px] ${
                         isHarvest
-                          ? "bg-emerald-50 text-emerald-700 border border-emerald-200"
+                          ? "bg-emerald-50 text-emerald-700"
                           : isLow
-                          ? "bg-amber-50 text-amber-800 border border-amber-200"
-                          : "bg-blue-50 text-blue-700 border border-blue-200"
+                          ? "bg-amber-50 text-amber-800"
+                          : "bg-slate-100 text-slate-600"
                       }`}
                     >
                       {isHarvest
-                        ? "☀️ Cosecha (Alta)"
+                        ? "Temporada alta"
                         : isLow
-                        ? "🌧️ Vacas Flacas"
-                        : "⛅ Mes Normal"}
+                        ? "Temporada baja"
+                        : "Mes normal"}
                     </span>
                   </div>
 
                   <div className="space-y-1.5 tabular-nums">
                     <div className="flex items-center justify-between">
-                      <span className="text-slate-600 flex items-center gap-1.5">
-                        <span className="w-2.5 h-2.5 rounded-full bg-amber-500 inline-block" />
-                        Ingreso Real (Volátil):
-                      </span>
+                      <span className="text-slate-500">Ingreso real:</span>
                       <span className="font-semibold text-slate-900">
                         {formatCurrency(row.income, currency, exchangeRate)}
                       </span>
                     </div>
 
                     <div className="flex items-center justify-between">
-                      <span className="text-emerald-700 font-medium flex items-center gap-1.5">
-                        <span className="w-2.5 h-2.5 rounded-full bg-emerald-600 inline-block" />
-                        Sueldo Estabilizado:
+                      <span className="text-emerald-700 font-medium">
+                        Sueldo estabilizado:
                       </span>
-                      <span className="font-bold text-emerald-700">
+                      <span className="font-semibold text-emerald-700">
                         {formatCurrency(
                           row.smoothedIncome,
                           currency,
@@ -136,21 +131,10 @@ export default function CashflowChart({
                       </span>
                     </div>
 
-                    <div className="flex items-center justify-between">
-                      <span className="text-slate-500 flex items-center gap-1.5">
-                        <span className="w-2.5 h-0.5 bg-blue-600 inline-block" />
-                        Piso Mensual Fijo:
-                      </span>
-                      <span className="font-medium text-blue-700">
-                        {formatCurrency(monthlyFloor, currency, exchangeRate)}
-                      </span>
-                    </div>
-
                     {showStressOverlay && stressDropPct > 0 && (
                       <div className="flex items-center justify-between pt-1 border-t border-slate-100">
-                        <span className="text-rose-600 flex items-center gap-1.5">
-                          <span className="w-2 h-2 rounded-full bg-rose-500 inline-block" />
-                          Simulación Crisis (-{stressDropPct}%):
+                        <span className="text-rose-600">
+                          Con baja (-{stressDropPct}%):
                         </span>
                         <span className="font-semibold text-rose-600">
                           {formatCurrency(
@@ -161,28 +145,6 @@ export default function CashflowChart({
                         </span>
                       </div>
                     )}
-
-                    <div className="pt-1.5 mt-1.5 border-t border-slate-100 flex items-center justify-between text-[11px]">
-                      <span className="text-slate-500">
-                        {row.bufferContribution >= 0
-                          ? "Aporte al Colchón:"
-                          : "Retiro del Colchón:"}
-                      </span>
-                      <span
-                        className={`font-semibold ${
-                          row.bufferContribution >= 0
-                            ? "text-emerald-600"
-                            : "text-amber-600"
-                        }`}
-                      >
-                        {row.bufferContribution >= 0 ? "+" : "-"}
-                        {formatCurrency(
-                          Math.abs(row.bufferContribution),
-                          currency,
-                          exchangeRate
-                        )}
-                      </span>
-                    </div>
                   </div>
                 </div>
               );
@@ -191,50 +153,39 @@ export default function CashflowChart({
 
           <ReferenceLine
             y={convert(monthlyFloor)}
-            stroke="#2563eb"
+            stroke="#94a3b8"
             strokeDasharray="4 4"
-            strokeWidth={1.5}
-            label={{
-              value: `Piso Vital (${formatCurrency(
-                monthlyFloor,
-                currency,
-                exchangeRate
-              )})`,
-              position: "insideBottomRight",
-              fill: "#1d4ed8",
-              fontSize: 11,
-              fontWeight: 600,
-            }}
+            strokeWidth={1.25}
           />
 
           <Area
             type="monotone"
             dataKey="smoothedDisplay"
-            name="Tu Sueldo Estabilizado (Waterfall)"
+            name="Sueldo estabilizado"
             stroke="#059669"
-            strokeWidth={3}
+            strokeWidth={2.5}
             fill="url(#smoothedGradient)"
-            activeDot={{ r: 6, fill: "#059669", stroke: "#ffffff", strokeWidth: 2 }}
+            activeDot={{ r: 5, fill: "#059669", stroke: "#ffffff", strokeWidth: 2 }}
           />
 
           <Line
             type="monotone"
             dataKey="rawDisplay"
-            name="Ingreso Real (La Montaña Rusa)"
+            name="Ingreso real"
             stroke="#d97706"
-            strokeWidth={2.25}
-            strokeDasharray="5 5"
-            dot={{ r: 3.5, fill: "#d97706", strokeWidth: 0 }}
-            activeDot={{ r: 5, fill: "#b45309" }}
+            strokeWidth={2}
+            strokeDasharray="4 4"
+            dot={{ r: 3, fill: "#d97706", strokeWidth: 0 }}
+            activeDot={{ r: 4, fill: "#b45309" }}
           />
 
           {showStressOverlay && stressDropPct > 0 && (
             <Line
               type="monotone"
               dataKey="stressedDisplay"
-              name={`Ingreso en Crisis (-${stressDropPct}%)`}
+              name={`Simulación (-${stressDropPct}%)`}
               stroke="#e11d48"
-              strokeWidth={1.75}
+              strokeWidth={1.5}
               strokeDasharray="2 3"
               dot={false}
             />
