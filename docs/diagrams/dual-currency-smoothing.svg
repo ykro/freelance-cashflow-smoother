@@ -1,0 +1,128 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg viewBox="0 0 1000 480" xmlns="http://www.w3.org/2000/svg" role="img" aria-labelledby="dual-currency-smoothing-title dual-currency-smoothing-desc" id="dual-currency-smoothing-root">
+        <title id="dual-currency-smoothing-title">Algoritmo bimonetario y estabilizacion estacional</title>
+        <desc id="dual-currency-smoothing-desc">Diagrama de flujo del motor bimonetario que consolida ingresos en Quetzales y Dolares, aprende cuales meses o semanas son buenos o bajos y determina cuanto apartar o retirar para garantizar un ingreso semanal seguro.</desc>
+        <defs>
+      <style>@import url('https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&amp;family=Geist:wght@400;500;600&amp;family=Geist+Mono:wght@400;500;600&amp;family=Noto+Serif:ital@0;1&amp;family=Noto+Sans+KR:wght@400;500;600&amp;family=Noto+Serif+KR:wght@400&amp;family=Noto+Sans+TC:wght@400;500;600&amp;family=Noto+Serif+TC:wght@400&amp;display=swap');
+      #dual-currency-smoothing-root { --color-paper:   #f5f5f5;
+      --color-ink:     #2d3142;
+      --color-muted:   #4f5d75;
+      --color-accent:  #eb6c36;
+      --font-sans:     'Geist', system-ui, sans-serif;
+      --font-serif:    'Instrument Serif', serif;
+      --font-mono:     'Geist Mono', ui-monospace, monospace; }
+      #dual-currency-smoothing-root { font-family: var(--font-sans); color: var(--color-ink); }
+      #dual-currency-smoothing-root .diagram-scroll { overflow-x: auto; width: 100%; }</style>
+          <pattern id="dual-currency-smoothing-dots" width="22" height="22" patternUnits="userSpaceOnUse">
+            <circle cx="1" cy="1" r="0.9" fill="#2d3142" fill-opacity="0.10"/>
+          </pattern>
+          <marker id="dual-currency-smoothing-arrow" markerWidth="8" markerHeight="6" refX="7" refY="3" orient="auto"><polygon points="0 0, 8 3, 0 6" fill="#4f5d75"/></marker>
+          <marker id="dual-currency-smoothing-arrow-accent" markerWidth="8" markerHeight="6" refX="7" refY="3" orient="auto"><polygon points="0 0, 8 3, 0 6" fill="#eb6c36"/></marker>
+          <marker id="dual-currency-smoothing-arrow-link" markerWidth="8" markerHeight="6" refX="7" refY="3" orient="auto"><polygon points="0 0, 8 3, 0 6" fill="#2e5aa8"/></marker>
+        </defs>
+
+        <rect width="100%" height="100%" fill="#f5f5f5"/>
+        <rect width="100%" height="100%" fill="url(#dual-currency-smoothing-dots)" opacity="0.55"/>
+
+        <!-- Zone: Reglas de Estabilizacion -->
+        <rect x="488" y="88" width="224" height="288" rx="8"
+              fill="#2d3142" fill-opacity="0.02" stroke="#2d3142" stroke-opacity="0.10" stroke-width="0.8"/>
+        <rect x="536" y="92" width="128" height="12" rx="2" fill="#f5f5f5"/>
+        <text x="600" y="101" fill="#2d3142" fill-opacity="0.40" font-size="7" font-family="'Geist Mono', monospace"
+              text-anchor="middle" letter-spacing="0.14em">REGLA WATERFALL</text>
+
+        <!-- Arrows first (behind boxes) -->
+        <line x1="204" y1="236" x2="264" y2="236" stroke="#2e5aa8" stroke-width="1.2" marker-end="url(#dual-currency-smoothing-arrow-link)"/>
+
+        <!-- Fan out from Classifier to Good Season vs Low Season -->
+        <path d="M 432,220 H 460 Q 468,220 468,212 V 164 Q 468,156 476,156 H 508"
+              fill="none" stroke="#eb6c36" stroke-width="1.4" marker-end="url(#dual-currency-smoothing-arrow-accent)"/>
+        <path d="M 432,252 H 460 Q 468,252 468,260 V 308 Q 468,316 476,316 H 508"
+              fill="none" stroke="#4f5d75" stroke-width="1.2" marker-end="url(#dual-currency-smoothing-arrow)"/>
+
+        <!-- Converge into Sueldo Estabilizado -->
+        <path d="M 692,156 H 724 Q 732,156 732,164 V 212 Q 732,220 740,220 H 776"
+              fill="none" stroke="#eb6c36" stroke-width="1.4" marker-end="url(#dual-currency-smoothing-arrow-accent)"/>
+        <path d="M 692,316 H 724 Q 732,316 732,308 V 260 Q 732,252 740,252 H 776"
+              fill="none" stroke="#4f5d75" stroke-width="1" stroke-dasharray="4,3" marker-end="url(#dual-currency-smoothing-arrow)"/>
+
+        <!-- Arrow labels (with opaque #f5f5f5 masks, 6-10px off line) -->
+        <rect x="208" y="216" width="52" height="12" rx="2" fill="#f5f5f5"/>
+        <text x="234" y="225" fill="#2e5aa8" font-size="8" font-family="'Geist Mono', monospace" text-anchor="middle" letter-spacing="0.08em">Q7.75=$1</text>
+
+        <rect x="440" y="136" width="60" height="12" rx="2" fill="#f5f5f5"/>
+        <text x="470" y="145" fill="#eb6c36" font-size="8" font-family="'Geist Mono', monospace" text-anchor="middle" letter-spacing="0.08em">SUPERAVIT</text>
+
+        <rect x="440" y="324" width="56" height="12" rx="2" fill="#f5f5f5"/>
+        <text x="468" y="333" fill="#4f5d75" font-size="8" font-family="'Geist Mono', monospace" text-anchor="middle" letter-spacing="0.08em">DEFICIT</text>
+
+        <rect x="700" y="136" width="56" height="12" rx="2" fill="#f5f5f5"/>
+        <text x="728" y="145" fill="#eb6c36" font-size="8" font-family="'Geist Mono', monospace" text-anchor="middle" letter-spacing="0.08em">RESERVA</text>
+
+        <rect x="700" y="324" width="56" height="12" rx="2" fill="#f5f5f5"/>
+        <text x="728" y="333" fill="#4f5d75" font-size="8" font-family="'Geist Mono', monospace" text-anchor="middle" letter-spacing="0.08em">SOPORTE</text>
+
+        <!-- Node 1: Flujo Nativo Bimonetario -->
+        <rect x="36" y="204" width="168" height="64" rx="6" fill="#f5f5f5"/>
+        <rect x="36" y="204" width="168" height="64" rx="6" fill="#4f5d75" fill-opacity="0.10" stroke="#7a8399" stroke-width="1"/>
+        <rect x="44" y="212" width="32" height="12" rx="2" fill="none" stroke="#7a8399" stroke-opacity="0.40" stroke-width="0.8"/>
+        <text x="60" y="221" fill="#7a8399" font-size="7" font-family="'Geist Mono', monospace" text-anchor="middle" letter-spacing="0.08em">DUAL</text>
+        <text x="120" y="240" fill="#2d3142" font-size="12" font-weight="600" font-family="'Geist', sans-serif" text-anchor="middle">Flujo Nativo Q + $</text>
+        <text x="120" y="256" fill="#4f5d75" font-size="9" font-family="'Geist Mono', monospace" text-anchor="middle">Quetzales y Dolares</text>
+
+        <!-- Node 2: Detector de Temporadas (Focal Coral 01) -->
+        <rect x="264" y="204" width="168" height="64" rx="6" fill="#f5f5f5"/>
+        <rect x="264" y="204" width="168" height="64" rx="6" fill="#eb6c36" fill-opacity="0.08" stroke="#eb6c36" stroke-width="1"/>
+        <rect x="272" y="212" width="36" height="12" rx="2" fill="none" stroke="#eb6c36" stroke-opacity="0.50" stroke-width="0.8"/>
+        <text x="290" y="221" fill="#eb6c36" font-size="7" font-family="'Geist Mono', monospace" text-anchor="middle" letter-spacing="0.08em">CLAS</text>
+        <text x="424" y="260" fill="#eb6c36" fill-opacity="0.10" font-size="32" font-weight="600" font-family="'Geist Mono', monospace" text-anchor="end">01</text>
+        <text x="348" y="240" fill="#2d3142" font-size="12" font-weight="600" font-family="'Geist', sans-serif" text-anchor="middle">Detector Estacional</text>
+        <text x="348" y="256" fill="#4f5d75" font-size="9" font-family="'Geist Mono', monospace" text-anchor="middle">Alta · Normal · Baja</text>
+
+        <!-- Node 3: Regla en Temporada Buena -->
+        <rect x="508" y="124" width="184" height="64" rx="6" fill="#f5f5f5"/>
+        <rect x="508" y="124" width="184" height="64" rx="6" fill="#ffffff" stroke="#2d3142" stroke-width="1"/>
+        <rect x="516" y="132" width="32" height="12" rx="2" fill="none" stroke="#2d3142" stroke-opacity="0.40" stroke-width="0.8"/>
+        <text x="532" y="141" fill="#2d3142" font-size="7" font-family="'Geist Mono', monospace" text-anchor="middle" letter-spacing="0.08em">ALTA</text>
+        <text x="600" y="160" fill="#2d3142" font-size="12" font-weight="600" font-family="'Geist', sans-serif" text-anchor="middle">Mes o Semana Buena</text>
+        <text x="600" y="176" fill="#4f5d75" font-size="9" font-family="'Geist Mono', monospace" text-anchor="middle">Aparta 30%-68% excedente</text>
+
+        <!-- Node 4: Regla en Temporada Baja -->
+        <rect x="508" y="284" width="184" height="64" rx="6" fill="#f5f5f5"/>
+        <rect x="508" y="284" width="184" height="64" rx="6" fill="#2d3142" fill-opacity="0.05" stroke="#4f5d75" stroke-width="1"/>
+        <rect x="516" y="292" width="32" height="12" rx="2" fill="none" stroke="#4f5d75" stroke-opacity="0.50" stroke-width="0.8"/>
+        <text x="532" y="301" fill="#4f5d75" font-size="7" font-family="'Geist Mono', monospace" text-anchor="middle" letter-spacing="0.08em">BAJA</text>
+        <text x="600" y="320" fill="#2d3142" font-size="12" font-weight="600" font-family="'Geist', sans-serif" text-anchor="middle">Temporada Baja</text>
+        <text x="600" y="336" fill="#4f5d75" font-size="9" font-family="'Geist Mono', monospace" text-anchor="middle">Aparta Q0 · Retira reserva</text>
+
+        <!-- Node 5: Ingreso Seguro Semanal (Focal Coral 02) -->
+        <rect x="776" y="204" width="188" height="64" rx="6" fill="#f5f5f5"/>
+        <rect x="776" y="204" width="188" height="64" rx="6" fill="#eb6c36" fill-opacity="0.08" stroke="#eb6c36" stroke-width="1"/>
+        <rect x="784" y="212" width="32" height="12" rx="2" fill="none" stroke="#eb6c36" stroke-opacity="0.50" stroke-width="0.8"/>
+        <text x="800" y="221" fill="#eb6c36" font-size="7" font-family="'Geist Mono', monospace" text-anchor="middle" letter-spacing="0.08em">SAFE</text>
+        <text x="956" y="260" fill="#eb6c36" fill-opacity="0.10" font-size="32" font-weight="600" font-family="'Geist Mono', monospace" text-anchor="end">02</text>
+        <text x="870" y="240" fill="#2d3142" font-size="12" font-weight="600" font-family="'Geist', sans-serif" text-anchor="middle">Sueldo Estabilizado</text>
+        <text x="870" y="256" fill="#4f5d75" font-size="9" font-family="'Geist Mono', monospace" text-anchor="middle">Semanal y Mensual (Q + $)</text>
+
+        <!-- Legend strip -->
+        <line x1="36" y1="404" x2="964" y2="404" stroke="#2d3142" stroke-opacity="0.10" stroke-width="0.8"/>
+        <text x="36" y="420" fill="#4f5d75" font-size="8" font-family="'Geist Mono', monospace" letter-spacing="0.18em">LEGEND</text>
+
+        <rect x="36" y="436" width="14" height="10" rx="2" fill="#eb6c36" fill-opacity="0.08" stroke="#eb6c36" stroke-width="1"/>
+        <text x="56" y="444" fill="#4f5d75" font-size="8.5" font-family="'Geist', sans-serif">Focal / clasificador y sueldo</text>
+
+        <rect x="236" y="436" width="14" height="10" rx="2" fill="#ffffff" stroke="#2d3142" stroke-width="1"/>
+        <text x="256" y="444" fill="#4f5d75" font-size="8.5" font-family="'Geist', sans-serif">Regla temporada alta</text>
+
+        <rect x="396" y="436" width="14" height="10" rx="2" fill="#2d3142" fill-opacity="0.05" stroke="#4f5d75" stroke-width="1"/>
+        <text x="416" y="444" fill="#4f5d75" font-size="8.5" font-family="'Geist', sans-serif">Regla temporada baja</text>
+
+        <rect x="556" y="436" width="14" height="10" rx="2" fill="#4f5d75" fill-opacity="0.10" stroke="#7a8399" stroke-width="1"/>
+        <text x="576" y="444" fill="#4f5d75" font-size="8.5" font-family="'Geist', sans-serif">Flujo bimonetario</text>
+
+        <line x1="684" y1="442" x2="712" y2="442" stroke="#eb6c36" stroke-width="1.4" marker-end="url(#dual-currency-smoothing-arrow-accent)"/>
+        <text x="720" y="444" fill="#4f5d75" font-size="8.5" font-family="'Geist', sans-serif">Ahorro activo</text>
+
+        <line x1="816" y1="442" x2="844" y2="442" stroke="#4f5d75" stroke-width="1" stroke-dasharray="4,3" marker-end="url(#dual-currency-smoothing-arrow)"/>
+        <text x="852" y="444" fill="#4f5d75" font-size="8.5" font-family="'Geist', sans-serif">Retiro reserva</text>
+      </svg>

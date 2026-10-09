@@ -1,21 +1,21 @@
-# 🚀 Guía de Onboarding: Freelance Cashflow Smoother
+# Guia de Onboarding: Estabilizador (`freelance-cashflow-smoother`)
 
-Bienvenido a la guía oficial de **Freelance Cashflow Smoother** (`freelance-cashflow-smoother`), el dashboard interactivo de estabilización de flujo de caja para trabajadores independientes, comerciantes por comisión y repartidores/conductores de plataforma en Guatemala y Latinoamérica.
+Bienvenido a la guia de **Estabilizador (`freelance-cashflow-smoother`)**, la herramienta de presupuesto para ingresos variables disenada para que trabajadores informales y freelancers aprendan cuales son sus meses o semanas buenas y malas y calculen cuanto apartar cada semana para no quedarse sin dinero en temporada baja.
 
-- 🌐 **Producción en Vivo (Vercel):** [https://freelance-cashflow-smoother.vercel.app](https://freelance-cashflow-smoother.vercel.app)
-- 📋 **Especificación Funcional:** [`SPEC.md`](../SPEC.md)
-- 🧮 **Documentación Matemática:** [`docs/ALGORITHM.md`](./ALGORITHM.md)
+- **Produccion en Vivo (Vercel):** [https://freelance-cashflow-smoother.vercel.app](https://freelance-cashflow-smoother.vercel.app)
+- **Especificacion Funcional:** [`SPEC.md`](../SPEC.md)
+- **Arquitectura del Sistema:** [`docs/ARCHITECTURE.md`](./ARCHITECTURE.md)
+- **Documentacion Matematica:** [`docs/ALGORITHM.md`](./ALGORITHM.md)
 
 ---
 
-## 1. Configuración de Desarrollo Local (Local Setup)
+## 1. Configuracion de Desarrollo Local
 
 ### Requisitos Previos
 - **Node.js** `>= 20.x`
 - **npm** `>= 10.x`
-- Clave de API de Google Gemini (`GEMINI_API_KEY`) opcional — el motor cuenta con **fallback determinista instantáneo** si no se configura clave de red.
 
-### Instalación Paso a Paso
+### Instalacion y Ejecucion
 
 ```bash
 # 1. Clonar el repositorio e ingresar al directorio
@@ -25,93 +25,39 @@ cd freelance-cashflow-smoother
 # 2. Instalar dependencias
 npm install
 
-# 3. Configurar variables de entorno locales
-cp .env.example .env.local
-```
-
-### Configuración de `.env.local`
-Crea un archivo `.env.local` en la raíz del proyecto con las siguientes variables:
-
-```env
-# Clave de Google AI Studio / Vertex AI para el Coach Estacional y Parser NL
-GEMINI_API_KEY="tu_api_key_aqui"
-
-# Modelos configurados en /api/cashflow-ai
-NEXT_PUBLIC_DEFAULT_AI_MODEL="gemini-3.8-flash"
-NEXT_PUBLIC_LOCAL_PARSER_MODEL="gemma-4-e2b"
-```
-
-> **💡 Nota sobre Resiliencia Offline/Demo:** Si ejecutas `npm run dev` sin `GEMINI_API_KEY`, el endpoint `/api/cashflow-ai` activa automáticamente su motor heurístico y parser regex local calibrado para español guatemalteco/latinoamericano (`GTQ` y `USD`), garantizando cero errores durante demostraciones en vivo.
-
-### Comandos de Ejecución y Verificación
-
-```bash
-# Levantar servidor de desarrollo en http://localhost:3000
+# 3. Levantar servidor de desarrollo en http://localhost:3000
 npm run dev
 
-# Compilar versión de producción y validar tipos TypeScript
+# 4. Compilar version de produccion y verificar tipos TypeScript
 npm run build
-
-# Ejecutar linter
-npm run lint
 ```
 
 ---
 
-## 2. Entendiendo los INPUTS y OUTPUTS del Dashboard
+## 2. Recorrido por las Dos Pantallas de la Aplicacion
 
-El diseño sigue una filosofía de **fricción cero (consumo en 5 segundos)**:
+### Pantalla 1: Ingresos y gastos (`1. Ingresos y gastos`)
+1. **Selecciona `Modo Mes` o `Modo Semana`:**
+   - Usa **Modo Mes** para evaluar tus ultimos 2 a 6 meses.
+   - Usa **Modo Semana** para evaluar tus ultimas 3 a 8 semanas.
+2. **Prueba los 3 ejemplos rapidos en 1 clic:**
+   - **Freelancer Diseno / Dev (`Modo Mes · Bimonetario $ + Q`):** Cobra proyectos en Dolares y Quetzales, paga gastos locales en `Q` y herramientas en `$`.
+   - **Comerciante / Independiente (`Modo Semana · En Quetzales Q`):** Registra semanas altas de quincena/fin de mes y semanas bajas por lluvias o menor venta.
+   - **Consultor Mixto (`Modo Mes · Estacionalidad Alta`):** Combina honorarios locales en `Q` y consultoria en `$` con picos marcados.
+3. **Ingresa tus gastos esenciales y tu reserva en `Q` y `$` al mismo tiempo:**
+   - No necesitas elegir una sola moneda: puedes capturar tus montos en Quetzales, en Dolares o en ambos simultaneamente.
+4. **Agrega o edita tus meses o semanas recientes:**
+   - Cada fila muestra al instante su etiqueta automatica (`Temporada Alta`, `Normal` o `Temporada Baja`) y el total combinado en `Q` y `$`.
+5. **Haz clic en `Calcular cuanto apartar cada semana`** para abrir tu plan semanal.
 
-### 📥 Los 3 Niveles de Input
-1. **Configuración Base (1 sola vez):**
-   - **Piso Mensual de Gastos Fijos (`monthlyFloor` / $F_{mes}$):** Renta/vivienda, alimentación básica, servicios/internet y transporte/herramientas de trabajo.
-   - **Fondo Colchón Actual (`currentBuffer` / $B_{actual}$):** Ahorro líquido disponible hoy para cubrir semanas bajas.
-2. **Historial de Estacionalidad (12 Meses):**
-   - Serie mensual de Enero a Diciembre que permite al algoritmo detectar cuántos meses caen por debajo del piso de vida y cuándo ocurre la próxima temporada baja.
-3. **Check-in Semanal (`weeklyIncome` / $I_t$):**
-   - El control deslizante o numérico principal de cada viernes: *"¿Cuánto dinero te entró esta semana?"*.
-
-### 📊 Los Outputs Accionables ("Las 3 Cubetas Semanales")
-Al ingresar o ajustar el ingreso de la semana ($I_t$), el motor calcula en tiempo real:
-- 🛡️ **Cubeta 1 — Aparta Hoy (`saveForLowSeason`):** Monto exacto en dinero y porcentaje que debes transferir hoy a tu Fondo de Temporada Baja.
-- 🏠 **Cubeta 2 — Reserva para Gastos Fijos (`fixedCostAllocation`):** Cuota intocable para cubrir una semana de tu Piso Mensual ($F_{sem} = F_{mes} / 4.33$).
-- ✨ **Cubeta 3 — Tu Sueldo Libre Seguro (`safeToSpend`):** Dinero disponible para gastar esta semana sin culpa ni riesgo de descapitalizarte.
-  - *Modo Rescate (Semana en Déficit):* Si $I_t < F_{sem}$, la tarjeta cambia automáticamente a estado ámbar indicando **$0 a apartar** y el **monto exacto a retirar de tu Fondo Colchón** (`withdrawFromBuffer`) para completar tus gastos fijos sin endeudarte.
-
----
-
-## 3. Probando los 3 Perfiles Reales (Guatemala / LATAM) en `GTQ (Q)` y `USD ($)`
-
-En la barra superior del dashboard encontrarás el selector de **Perfiles Demo 1-Click** y el conmutador bimoneda **`GTQ (Q)` ↔ `USD ($)`** (tasa base `Q7.75 = $1.00 USD`):
-
-| ID de Perfil | Nombre y Rol | Ubicación | Caso de Uso a Probar |
-| :--- | :--- | :--- | :--- |
-| `creative-freelancer` | **Sofía Méndez**<br>*Diseñadora UX & Dev Freelance* | Antigua Guatemala / Remoto LATAM | **Semana con Superávit:** Piso mensual de `Q7,800` (`$1,006 USD`), colchón de `Q6,200` e ingreso semanal de `Q3,100`. Observa cómo el algoritmo retiene una cuota óptima para blindar Enero y Febrero. |
-| `commission-merchant` | **Carlos Alvarado**<br>*Comerciante & Ventas por Comisión* | Ciudad de Guatemala / Mixco | **Estacionalidad Comercial:** Picos en Bono 14 (Julio) y Navidad, con caídas fuertes en época de lluvias (Mayo, Septiembre, Octubre). Ideal para probar el **Mapa Estacional de 12 Meses**. |
-| `app-driver` | **Jorge Ixchop**<br>*Conductor de App & Repartidor* | Quetzaltenango / Zona Metropolitana | **Semana en Déficit (Modo Rescate):** Configurado intencionalmente con un ingreso semanal bajo (`Q980` vs. piso semanal de `Q1,201`) para demostrar cómo el Fondo Colchón inyecta automáticamente `Q221` para proteger sus gastos fijos. |
-
----
-
-## 4. Uso del Onboarding en Lenguaje Natural y el Switch A/B del Coach IA
-
-### Dictado / Texto Coloquial (`gemma-4-e2b` / `gemini-3.8-flash`)
-En el panel **"Configuración por Voz o Texto Libre"**, puedes escribir frases en lenguaje natural como:
-> *"De alquiler y comida gasto como Q6,800 al mes, ahorita tengo Q4,500 guardados, esta semana me entraron Q2,900 y mis meses más flojos son enero, mayo y septiembre"*
-
-Al presionar **Extraer Parámetros con IA**, el endpoint `/api/cashflow-ai` (`action: "parse_natural_language"`) transforma el texto en el JSON estructurado del dashboard y recalcula las 3 cubetas al instante.
-
-### Switch A/B de Modelos en Vivo (`gemini-3.8-flash` vs `gemma-4-e2b`)
-En la sección **Coach Financiero Estacional & Prueba A/B**:
-1. Selecciona **Variante A (`gemini-3.8-flash`)** para obtener una estrategia estacional profunda de 3 meses con análisis de riesgo y recomendaciones accionables.
-2. Selecciona **Variante B (`gemma-4-e2b`)** para comparar velocidad de inferencia, latencia en milisegundos (`latencyMs`) y concisión de respuesta pensada para ejecución local/edge.
-3. Usa el **Simulador de Crisis (Stress Test)** deslizando una caída de ingresos del `0%` al `80%` para verificar cuántas semanas resiste tu Fondo Colchón (`stressedRunwayWeeks`).
-
----
-
-## 5. Despliegue Continuo en Vercel (Auto-Deploy)
-
-El repositorio está vinculado a **Vercel** para despliegue automático en cada push a `main`:
-- **URL Productiva:** `https://freelance-cashflow-smoother.vercel.app`
-- **Ramas Activas:**
-  - `main`: Rama principal de producción.
-  - `benchmark/argon-v1`: Rama congelada de referencia para el benchmark comparativo [`ykro/gemini-argon-agy-benchmark`](https://github.com/ykro/gemini-argon-agy-benchmark).
+### Pantalla 2: Plan semanal (`2. Plan semanal`)
+1. **Cuanto apartar cada semana (Tarjeta Hero):**
+   - Muestra el monto exacto en `Q` y `$` que debes apartar por semana, diferenciando la regla para semanas buenas frente a la regla de retiro en temporada baja.
+2. **Tu sueldo propio estabilizado:**
+   - Presenta tu ingreso seguro semanal y su equivalente mensual estable.
+3. **Aprendizaje de temporadas y Desglose bimonetario (`Q` + `$`):**
+   - Resume el promedio de tus periodos buenos y malos, el avance de tu reserva y la recomendacion practica de manejo entre Quetzales y Dolares.
+4. **Grafica interactiva y Simulador (`-50%` a `+50%`):**
+   - Desliza hacia la izquierda (`-50%`) para simular una temporada baja o hacia la derecha (`+50%`) para simular una temporada alta.
+5. **Boton `Volver a editar mis ingresos y gastos`:**
+   - Ubicado en el encabezado superior para regresar en cualquier momento a la Pantalla 1.

@@ -1,0 +1,203 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Estabilizador · Flujo de Presupuesto para Ingresos Variables</title>
+  <link href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=Geist:wght@400;500;600&family=Geist+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    :root {
+      --color-paper:   #f5f5f5;
+      --color-ink:     #2d3142;
+      --color-muted:   #4f5d75;
+      --color-accent:  #eb6c36;
+      --font-sans:     'Geist', system-ui, sans-serif;
+      --font-serif:    'Instrument Serif', serif;
+      --font-mono:     'Geist Mono', ui-monospace, monospace;
+    }
+
+    body {
+      font-family: var(--font-sans);
+      background: var(--color-paper);
+      color: var(--color-ink);
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 3rem 2rem;
+    }
+
+    .frame { max-width: 1200px; width: 100%; }
+    .diagram-scroll { overflow-x: auto; width: 100%; }
+
+    .eyebrow {
+      font-family: var(--font-mono);
+      font-size: 0.66rem;
+      font-weight: 500;
+      letter-spacing: 0.18em;
+      text-transform: uppercase;
+      color: var(--color-muted);
+      margin-bottom: 0.5rem;
+    }
+
+    h1 {
+      font-family: var(--font-serif);
+      font-size: clamp(1.5rem, 2.4vw + 0.75rem, 2rem);
+      font-weight: 400;
+      letter-spacing: -0.02em;
+      line-height: 1.15;
+      color: var(--color-ink);
+      margin-bottom: 1.5rem;
+    }
+
+    svg { width: 100%; min-width: 1000px; display: block; }
+  </style>
+</head>
+<body>
+  <div class="frame">
+    <p class="eyebrow">Architecture · Estabilizador</p>
+    <h1>Flujo de dos pantallas: aprendizaje estacional y cuota semanal</h1>
+
+    <div class="diagram-scroll">
+      <svg viewBox="0 0 1000 480" xmlns="http://www.w3.org/2000/svg" role="img" aria-labelledby="cashflow-pipeline-title cashflow-pipeline-desc">
+        <title id="cashflow-pipeline-title">Flujo de dos pantallas de Estabilizador</title>
+        <desc id="cashflow-pipeline-desc">Diagrama de arquitectura mostrando la captura de meses o semanas en Quetzales y Dolares, el motor de aprendizaje estacional y el panel de resultados con cuota semanal a apartar y simulador bidireccional.</desc>
+        <defs>
+          <pattern id="dots" width="22" height="22" patternUnits="userSpaceOnUse">
+            <circle cx="1" cy="1" r="0.9" fill="rgba(45,49,66,0.10)"/>
+          </pattern>
+          <marker id="arrow" markerWidth="8" markerHeight="6" refX="7" refY="3" orient="auto"><polygon points="0 0, 8 3, 0 6" fill="#4f5d75"/></marker>
+          <marker id="arrow-accent" markerWidth="8" markerHeight="6" refX="7" refY="3" orient="auto"><polygon points="0 0, 8 3, 0 6" fill="#eb6c36"/></marker>
+          <marker id="arrow-link" markerWidth="8" markerHeight="6" refX="7" refY="3" orient="auto"><polygon points="0 0, 8 3, 0 6" fill="#2e5aa8"/></marker>
+        </defs>
+
+        <rect width="100%" height="100%" fill="#f5f5f5"/>
+        <rect width="100%" height="100%" fill="url(#dots)" opacity="0.55"/>
+
+        <!-- Zone 1: Pantalla 1 (Captura) -->
+        <rect x="32" y="96" width="208" height="272" rx="8"
+              fill="rgba(45,49,66,0.02)" stroke="rgba(45,49,66,0.10)" stroke-width="0.8"/>
+        <rect x="76" y="100" width="120" height="12" rx="2" fill="#f5f5f5"/>
+        <text x="136" y="109" fill="rgba(45,49,66,0.40)" font-size="7" font-family="'Geist Mono', monospace"
+              text-anchor="middle" letter-spacing="0.14em">PANTALLA 1 · INPUT</text>
+
+        <!-- Zone 2: Pantalla 2 (Resultados) -->
+        <rect x="644" y="64" width="324" height="316" rx="8"
+              fill="rgba(45,49,66,0.02)" stroke="rgba(45,49,66,0.10)" stroke-width="0.8"/>
+        <rect x="742" y="68" width="128" height="12" rx="2" fill="#f5f5f5"/>
+        <text x="806" y="77" fill="rgba(45,49,66,0.40)" font-size="7" font-family="'Geist Mono', monospace"
+              text-anchor="middle" letter-spacing="0.14em">PANTALLA 2 · OUTPUT</text>
+
+        <!-- Arrows first (behind boxes) -->
+        <path d="M 220,172 H 284 Q 292,172 292,180 V 216 Q 292,224 300,224 H 348"
+              fill="none" stroke="#2e5aa8" stroke-width="1.2" marker-end="url(#arrow-link)"/>
+        <path d="M 220,300 H 284 Q 292,300 292,292 V 256 Q 292,248 300,248 H 348"
+              fill="none" stroke="#2e5aa8" stroke-width="1.2" marker-end="url(#arrow-link)"/>
+
+        <!-- Fan out from Engine to 3 Output cards -->
+        <path d="M 548,220 H 596 Q 604,220 604,212 V 140 Q 604,132 612,132 H 668"
+              fill="none" stroke="#eb6c36" stroke-width="1.4" marker-end="url(#arrow-accent)"/>
+        <line x1="548" y1="236" x2="668" y2="236" stroke="#4f5d75" stroke-width="1.2" marker-end="url(#arrow)"/>
+        <path d="M 548,252 H 596 Q 604,252 604,260 V 324 Q 604,332 612,332 H 668"
+              fill="none" stroke="#4f5d75" stroke-width="1.2" marker-end="url(#arrow)"/>
+
+        <!-- Dashed simulation feedback loop -->
+        <path d="M 668,348 H 456 Q 448,348 448,340 V 268"
+              fill="none" stroke="#4f5d75" stroke-width="1" stroke-dasharray="4,3" marker-end="url(#arrow)"/>
+
+        <!-- Arrow labels (with opaque #f5f5f5 masks, 6-10px off line) -->
+        <rect x="232" y="152" width="52" height="12" rx="2" fill="#f5f5f5"/>
+        <text x="258" y="161" fill="#2e5aa8" font-size="8" font-family="'Geist Mono', monospace" text-anchor="middle" letter-spacing="0.08em">2-8 PER</text>
+
+        <rect x="232" y="308" width="52" height="12" rx="2" fill="#f5f5f5"/>
+        <text x="258" y="317" fill="#2e5aa8" font-size="8" font-family="'Geist Mono', monospace" text-anchor="middle" letter-spacing="0.08em">GTQ+USD</text>
+
+        <rect x="608" y="112" width="52" height="12" rx="2" fill="#f5f5f5"/>
+        <text x="634" y="121" fill="#eb6c36" font-size="8" font-family="'Geist Mono', monospace" text-anchor="middle" letter-spacing="0.08em">APARTAR</text>
+
+        <rect x="580" y="216" width="60" height="12" rx="2" fill="#f5f5f5"/>
+        <text x="610" y="225" fill="#4f5d75" font-size="8" font-family="'Geist Mono', monospace" text-anchor="middle" letter-spacing="0.08em">BIMONEDA</text>
+
+        <rect x="504" y="356" width="68" height="12" rx="2" fill="#f5f5f5"/>
+        <text x="538" y="365" fill="#4f5d75" font-size="8" font-family="'Geist Mono', monospace" text-anchor="middle" letter-spacing="0.08em">DELTA +-50%</text>
+
+        <!-- Node 1: Historial Mes / Semana -->
+        <rect x="52" y="140" width="168" height="64" rx="6" fill="#f5f5f5"/>
+        <rect x="52" y="140" width="168" height="64" rx="6" fill="rgba(79,93,117,0.10)" stroke="#7a8399" stroke-width="1"/>
+        <rect x="60" y="148" width="32" height="12" rx="2" fill="transparent" stroke="rgba(122,131,153,0.40)" stroke-width="0.8"/>
+        <text x="76" y="157" fill="#7a8399" font-size="7" font-family="'Geist Mono', monospace" text-anchor="middle" letter-spacing="0.08em">MODO</text>
+        <text x="136" y="176" fill="#2d3142" font-size="12" font-weight="600" font-family="'Geist', sans-serif" text-anchor="middle">Ingresos Recientes</text>
+        <text x="136" y="192" fill="#4f5d75" font-size="9" font-family="'Geist Mono', monospace" text-anchor="middle">Modo Mes · Modo Semana</text>
+
+        <!-- Node 2: Gastos y Reserva (Q + $) -->
+        <rect x="52" y="268" width="168" height="64" rx="6" fill="#f5f5f5"/>
+        <rect x="52" y="268" width="168" height="64" rx="6" fill="rgba(45,49,66,0.05)" stroke="#4f5d75" stroke-width="1"/>
+        <rect x="60" y="276" width="32" height="12" rx="2" fill="transparent" stroke="rgba(79,93,117,0.50)" stroke-width="0.8"/>
+        <text x="76" y="285" fill="#4f5d75" font-size="7" font-family="'Geist Mono', monospace" text-anchor="middle" letter-spacing="0.08em">BASE</text>
+        <text x="136" y="304" fill="#2d3142" font-size="12" font-weight="600" font-family="'Geist', sans-serif" text-anchor="middle">Gastos y Reserva</text>
+        <text x="136" y="320" fill="#4f5d75" font-size="9" font-family="'Geist Mono', monospace" text-anchor="middle">Simultaneo en Q y $</text>
+
+        <!-- Node 3: Motor Estacional (Focal Coral 01) -->
+        <rect x="348" y="204" width="200" height="64" rx="6" fill="#f5f5f5"/>
+        <rect x="348" y="204" width="200" height="64" rx="6" fill="rgba(235,108,54,0.08)" stroke="#eb6c36" stroke-width="1"/>
+        <rect x="356" y="212" width="36" height="12" rx="2" fill="transparent" stroke="rgba(235,108,54,0.50)" stroke-width="0.8"/>
+        <text x="374" y="221" fill="#eb6c36" font-size="7" font-family="'Geist Mono', monospace" text-anchor="middle" letter-spacing="0.08em">CORE</text>
+        <text x="540" y="260" fill="rgba(235,108,54,0.10)" font-size="32" font-weight="600" font-family="'Geist Mono', monospace" text-anchor="end">01</text>
+        <text x="448" y="240" fill="#2d3142" font-size="12" font-weight="600" font-family="'Geist', sans-serif" text-anchor="middle">Motor Estacional</text>
+        <text x="448" y="256" fill="#4f5d75" font-size="9" font-family="'Geist Mono', monospace" text-anchor="middle">cashflow-engine.ts</text>
+
+        <!-- Node 4: Cuota Semanal a Apartar (Focal Coral 02) -->
+        <rect x="668" y="100" width="276" height="64" rx="6" fill="#f5f5f5"/>
+        <rect x="668" y="100" width="276" height="64" rx="6" fill="rgba(235,108,54,0.08)" stroke="#eb6c36" stroke-width="1"/>
+        <rect x="676" y="108" width="36" height="12" rx="2" fill="transparent" stroke="rgba(235,108,54,0.50)" stroke-width="0.8"/>
+        <text x="694" y="117" fill="#eb6c36" font-size="7" font-family="'Geist Mono', monospace" text-anchor="middle" letter-spacing="0.08em">HERO</text>
+        <text x="936" y="156" fill="rgba(235,108,54,0.10)" font-size="32" font-weight="600" font-family="'Geist Mono', monospace" text-anchor="end">02</text>
+        <text x="806" y="136" fill="#2d3142" font-size="12" font-weight="600" font-family="'Geist', sans-serif" text-anchor="middle">Cuanto Apartar Cada Semana</text>
+        <text x="806" y="152" fill="#4f5d75" font-size="9" font-family="'Geist Mono', monospace" text-anchor="middle">Regla Alta vs Baja + Sueldo Seguro</text>
+
+        <!-- Node 5: Desglose Bimonetario y Temporadas -->
+        <rect x="668" y="204" width="276" height="64" rx="6" fill="#f5f5f5"/>
+        <rect x="668" y="204" width="276" height="64" rx="6" fill="#ffffff" stroke="#2d3142" stroke-width="1"/>
+        <rect x="676" y="212" width="36" height="12" rx="2" fill="transparent" stroke="rgba(45,49,66,0.40)" stroke-width="0.8"/>
+        <text x="694" y="221" fill="#2d3142" font-size="7" font-family="'Geist Mono', monospace" text-anchor="middle" letter-spacing="0.08em">DUAL</text>
+        <text x="806" y="240" fill="#2d3142" font-size="12" font-weight="600" font-family="'Geist', sans-serif" text-anchor="middle">Aprendizaje y Flujo Q + $</text>
+        <text x="806" y="256" fill="#4f5d75" font-size="9" font-family="'Geist Mono', monospace" text-anchor="middle">Promedios Alta/Baja · Conversion FX</text>
+
+        <!-- Node 6: Grafica y Simulador Bidireccional -->
+        <rect x="668" y="300" width="276" height="64" rx="6" fill="#f5f5f5"/>
+        <rect x="668" y="300" width="276" height="64" rx="6" fill="rgba(45,49,66,0.03)" stroke="rgba(45,49,66,0.30)" stroke-width="1"/>
+        <rect x="676" y="308" width="36" height="12" rx="2" fill="transparent" stroke="rgba(45,49,66,0.22)" stroke-width="0.8"/>
+        <text x="694" y="317" fill="#7a8399" font-size="7" font-family="'Geist Mono', monospace" text-anchor="middle" letter-spacing="0.08em">SIM</text>
+        <text x="806" y="336" fill="#2d3142" font-size="12" font-weight="600" font-family="'Geist', sans-serif" text-anchor="middle">Grafica y Simulador (-50% a +50%)</text>
+        <text x="806" y="352" fill="#4f5d75" font-size="9" font-family="'Geist Mono', monospace" text-anchor="middle">Temporada Baja · Base · Temporada Alta</text>
+
+        <!-- Legend strip -->
+        <line x1="32" y1="404" x2="968" y2="404" stroke="rgba(45,49,66,0.10)" stroke-width="0.8"/>
+        <text x="32" y="420" fill="#4f5d75" font-size="8" font-family="'Geist Mono', monospace" letter-spacing="0.18em">LEGEND</text>
+
+        <rect x="32" y="436" width="14" height="10" rx="2" fill="rgba(235,108,54,0.08)" stroke="#eb6c36" stroke-width="1"/>
+        <text x="52" y="444" fill="#4f5d75" font-size="8.5" font-family="'Geist', sans-serif">Focal / motor y meta semanal</text>
+
+        <rect x="220" y="436" width="14" height="10" rx="2" fill="#ffffff" stroke="#2d3142" stroke-width="1"/>
+        <text x="240" y="444" fill="#4f5d75" font-size="8.5" font-family="'Geist', sans-serif">Desglose bimonetario</text>
+
+        <rect x="380" y="436" width="14" height="10" rx="2" fill="rgba(45,49,66,0.05)" stroke="#4f5d75" stroke-width="1"/>
+        <text x="400" y="444" fill="#4f5d75" font-size="8.5" font-family="'Geist', sans-serif">Parametros base</text>
+
+        <rect x="520" y="436" width="14" height="10" rx="2" fill="rgba(79,93,117,0.10)" stroke="#7a8399" stroke-width="1"/>
+        <text x="540" y="444" fill="#4f5d75" font-size="8.5" font-family="'Geist', sans-serif">Captura usuario</text>
+
+        <line x1="652" y1="442" x2="680" y2="442" stroke="#2e5aa8" stroke-width="1.2" marker-end="url(#arrow-link)"/>
+        <text x="688" y="444" fill="#4f5d75" font-size="8.5" font-family="'Geist', sans-serif">Entrada Q + $</text>
+
+        <line x1="776" y1="442" x2="804" y2="442" stroke="#eb6c36" stroke-width="1.4" marker-end="url(#arrow-accent)"/>
+        <text x="812" y="444" fill="#4f5d75" font-size="8.5" font-family="'Geist', sans-serif">Flujo principal</text>
+
+        <line x1="896" y1="442" x2="924" y2="442" stroke="#4f5d75" stroke-width="1" stroke-dasharray="4,3" marker-end="url(#arrow)"/>
+        <text x="932" y="444" fill="#4f5d75" font-size="8.5" font-family="'Geist', sans-serif">Simulacion</text>
+      </svg>
+    </div>
+  </div>
+</body>
+</html>

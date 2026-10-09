@@ -12,48 +12,46 @@ import {
   Tooltip,
   ReferenceLine,
 } from "recharts";
-import {
-  CurrencyCode,
-  formatCurrency,
-  MonthlyEvaluatedPoint,
-} from "@/lib/cashflowEngine";
+import { CurrencyCode, EvaluatedPeriodPoint } from "@/types/cashflow";
+import { formatGTQ, formatUSD } from "@/lib/cashflow-engine";
 
 interface CashflowChartProps {
-  data: MonthlyEvaluatedPoint[];
-  monthlyFloor: number;
+  data: EvaluatedPeriodPoint[];
+  periodFloorGTQ: number;
   currency: CurrencyCode;
   exchangeRate: number;
-  showStressOverlay: boolean;
-  stressDropPct: number;
+  simulationDeltaPct: number;
 }
 
 export default function CashflowChart({
   data,
-  monthlyFloor,
+  periodFloorGTQ,
   currency,
   exchangeRate,
-  showStressOverlay,
-  stressDropPct,
+  simulationDeltaPct,
 }: CashflowChartProps) {
-  const convert = (val: number) =>
-    currency === "USD" ? Math.round(val / exchangeRate) : Math.round(val);
+  const convert = (valGTQ: number) =>
+    currency === "USD" ? Math.round(valGTQ / exchangeRate) : Math.round(valGTQ);
 
   const chartData = data.map((point) => ({
     ...point,
-    rawDisplay: convert(point.income),
-    smoothedDisplay: convert(point.smoothedIncome),
-    floorDisplay: convert(monthlyFloor),
-    stressedDisplay: convert(point.stressedIncome),
+    rawDisplay: convert(point.totalGTQ),
+    smoothedDisplay: convert(point.smoothedGTQ),
+    floorDisplay: convert(periodFloorGTQ),
+    simulatedDisplay: convert(point.simulatedIncomeGTQ),
+    simulatedSmoothedDisplay: convert(point.simulatedSmoothedGTQ),
   }));
 
   const symbol = currency === "GTQ" ? "Q" : "$";
+  const hasSimulation = simulationDeltaPct !== 0;
+  const isPositiveSim = simulationDeltaPct > 0;
 
   return (
-    <div className="w-full h-[300px]">
+    <div className="w-full h-[310px]">
       <ResponsiveContainer width="100%" height="100%">
         <ComposedChart
           data={chartData}
-          margin={{ top: 10, right: 12, left: 0, bottom: 0 }}
+          margin={{ top: 12, right: 16, left: 0, bottom: 4 }}
         >
           <defs>
             <linearGradient id="smoothedGradient" x1="0" y1="0" x2="0" y2="1">
@@ -67,10 +65,10 @@ export default function CashflowChart({
             stroke="#e2e8f0"
           />
           <XAxis
-            dataKey="shortName"
+            dataKey="shortLabel"
             axisLine={{ stroke: "#e2e8f0" }}
             tickLine={false}
-            tick={{ fill: "#64748b", fontSize: 12, fontWeight: 500 }}
+            tick={{ fill: "#475569", fontSize: 12, fontWeight: 500 }}
           />
           <YAxis
             axisLine={false}
@@ -83,66 +81,101 @@ export default function CashflowChart({
           <Tooltip
             content={({ active, payload }) => {
               if (!active || !payload || !payload.length) return null;
-              const row = payload[0].payload as MonthlyEvaluatedPoint;
-              const isHarvest = row.classification === "ALTA";
+              const row = payload[0].payload as EvaluatedPeriodPoint;
+              const isHigh = row.classification === "ALTA";
               const isLow = row.classification === "BAJA";
 
               return (
-                <div className="bg-white border border-slate-200 rounded-xl shadow-md p-3 text-xs min-w-[210px]">
-                  <div className="flex items-center justify-between border-b border-slate-100 pb-2 mb-2">
+                <div className="bg-white border border-slate-200 rounded-xl shadow-md p-3.5 text-xs min-w-[240px]">
+                  <div className="flex items-center justify-between border-b border-slate-100 pb-2 mb-2.5 gap-3">
                     <span className="font-semibold text-slate-900">
-                      {row.monthName}
+                      {row.label}
                     </span>
                     <span
-                      className={`px-2 py-0.5 rounded-full font-medium text-[11px] ${
-                        isHarvest
-                          ? "bg-emerald-50 text-emerald-700"
+                      className={`px-2 py-0.5 rounded-full font-medium text-[11px] shrink-0 ${
+                        isHigh
+                          ? "bg-emerald-50 text-emerald-700 border border-emerald-200"
                           : isLow
-                          ? "bg-amber-50 text-amber-800"
-                          : "bg-slate-100 text-slate-600"
+                          ? "bg-amber-50 text-amber-800 border border-amber-200"
+                          : "bg-slate-100 text-slate-600 border border-slate-200"
                       }`}
                     >
-                      {isHarvest
-                        ? "Temporada alta"
+                      {isHigh
+                        ? "Temporada Alta"
                         : isLow
-                        ? "Temporada baja"
-                        : "Mes normal"}
+                        ? "Temporada Baja"
+                        : "Normal"}
                     </span>
                   </div>
 
                   <div className="space-y-1.5 tabular-nums">
-                    <div className="flex items-center justify-between">
+                    <div className="flex items-center justify-between gap-4">
                       <span className="text-slate-500">Ingreso real:</span>
                       <span className="font-semibold text-slate-900">
-                        {formatCurrency(row.income, currency, exchangeRate)}
+                        {formatGTQ(row.totalGTQ)} · {formatUSD(row.totalUSD)}
                       </span>
                     </div>
 
-                    <div className="flex items-center justify-between">
+                    <div className="flex items-center justify-between gap-4">
                       <span className="text-emerald-700 font-medium">
                         Sueldo estabilizado:
                       </span>
                       <span className="font-semibold text-emerald-700">
-                        {formatCurrency(
-                          row.smoothedIncome,
-                          currency,
-                          exchangeRate
-                        )}
+                        {formatGTQ(row.smoothedGTQ)} ·{" "}
+                        {formatUSD(row.smoothedUSD)}
                       </span>
                     </div>
 
-                    {showStressOverlay && stressDropPct > 0 && (
-                      <div className="flex items-center justify-between pt-1 border-t border-slate-100">
-                        <span className="text-rose-600">
-                          Con baja (-{stressDropPct}%):
-                        </span>
-                        <span className="font-semibold text-rose-600">
-                          {formatCurrency(
-                            row.stressedIncome,
-                            currency,
-                            exchangeRate
-                          )}
-                        </span>
+                    <div className="flex items-center justify-between gap-4">
+                      <span className="text-slate-500">
+                        {row.bufferContributionGTQ >= 0
+                          ? "Apartado al fondo:"
+                          : "Retiro del fondo:"}
+                      </span>
+                      <span
+                        className={`font-semibold ${
+                          row.bufferContributionGTQ >= 0
+                            ? "text-emerald-600"
+                            : "text-amber-700"
+                        }`}
+                      >
+                        {row.bufferContributionGTQ >= 0 ? "+" : "-"}
+                        {formatGTQ(Math.abs(row.bufferContributionGTQ))}
+                      </span>
+                    </div>
+
+                    {hasSimulation && (
+                      <div className="pt-1.5 mt-1.5 border-t border-slate-100 space-y-1">
+                        <div className="flex items-center justify-between gap-4">
+                          <span
+                            className={
+                              isPositiveSim ? "text-sky-700" : "text-rose-600"
+                            }
+                          >
+                            Ingreso simulado (
+                            {isPositiveSim
+                              ? `+${simulationDeltaPct}%`
+                              : `${simulationDeltaPct}%`}
+                            ):
+                          </span>
+                          <span
+                            className={`font-semibold ${
+                              isPositiveSim ? "text-sky-700" : "text-rose-600"
+                            }`}
+                          >
+                            {formatGTQ(row.simulatedIncomeGTQ)} ·{" "}
+                            {formatUSD(row.simulatedIncomeGTQ / exchangeRate)}
+                          </span>
+                        </div>
+                        <div className="flex items-center justify-between gap-4">
+                          <span className="text-slate-500">
+                            Estabilizado simulado:
+                          </span>
+                          <span className="font-semibold text-slate-800">
+                            {formatGTQ(row.simulatedSmoothedGTQ)} ·{" "}
+                            {formatUSD(row.simulatedSmoothedGTQ / exchangeRate)}
+                          </span>
+                        </div>
                       </div>
                     )}
                   </div>
@@ -152,7 +185,7 @@ export default function CashflowChart({
           />
 
           <ReferenceLine
-            y={convert(monthlyFloor)}
+            y={convert(periodFloorGTQ)}
             stroke="#94a3b8"
             strokeDasharray="4 4"
             strokeWidth={1.25}
@@ -165,7 +198,12 @@ export default function CashflowChart({
             stroke="#059669"
             strokeWidth={2.5}
             fill="url(#smoothedGradient)"
-            activeDot={{ r: 5, fill: "#059669", stroke: "#ffffff", strokeWidth: 2 }}
+            activeDot={{
+              r: 5,
+              fill: "#059669",
+              stroke: "#ffffff",
+              strokeWidth: 2,
+            }}
           />
 
           <Line
@@ -179,15 +217,23 @@ export default function CashflowChart({
             activeDot={{ r: 4, fill: "#b45309" }}
           />
 
-          {showStressOverlay && stressDropPct > 0 && (
+          {hasSimulation && (
             <Line
               type="monotone"
-              dataKey="stressedDisplay"
-              name={`Simulación (-${stressDropPct}%)`}
-              stroke="#e11d48"
-              strokeWidth={1.5}
+              dataKey="simulatedDisplay"
+              name={`Simulacion (${
+                isPositiveSim
+                  ? `+${simulationDeltaPct}%`
+                  : `${simulationDeltaPct}%`
+              })`}
+              stroke={isPositiveSim ? "#0284c7" : "#e11d48"}
+              strokeWidth={2}
               strokeDasharray="2 3"
-              dot={false}
+              dot={{
+                r: 2.5,
+                fill: isPositiveSim ? "#0284c7" : "#e11d48",
+                strokeWidth: 0,
+              }}
             />
           )}
         </ComposedChart>

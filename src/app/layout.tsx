@@ -2,9 +2,9 @@ import type { Metadata } from "next";
 import "./globals.css";
 
 export const metadata: Metadata = {
-  title: "Freelance Cashflow Smoother | Tu Sueldo Estabilizado Semanal",
+  title: "Estabilizador | Presupuesto para ingresos variables (Q + $)",
   description:
-    "Transforma ingresos variables de freelance, comisiones o plataformas en una cuota semanal exacta de ahorro y un sueldo propio estabilizado con el algoritmo Waterfall Buffer + Gemini 3.8 Flash.",
+    "Para trabajadores informales o freelancers: aprende tus meses o semanas buenas y malas y calcula cuanto apartar cada semana para no quedarte sin dinero en temporada baja.",
 };
 
 export default function RootLayout({
