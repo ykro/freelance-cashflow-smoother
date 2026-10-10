@@ -47,15 +47,14 @@ const PRESET_SHORT_LABELS: Record<string, string> = {
   "consultor-mixto": "Consultor Mixto",
 };
 
-const STEPS: { id: 1 | 2 | 3 | 4; label: string }[] = [
+const STEPS: { id: 1 | 2 | 3; label: string }[] = [
   { id: 1, label: "1. Ingresos" },
   { id: 2, label: "2. Gastos" },
   { id: 3, label: "3. Tu Plan" },
-  { id: 4, label: "4. Gráfica y Simulador" },
 ];
 
 export default function CashflowDashboard() {
-  const [page, setPage] = useState<1 | 2 | 3 | 4>(1);
+  const [page, setPage] = useState<1 | 2 | 3>(1);
   const [primaryCurrency, setPrimaryCurrency] = useState<CurrencyCode>("GTQ");
   const [activePresetId, setActivePresetId] = useState<string>(
     PRESET_PROFILES[0].id
@@ -645,113 +644,98 @@ export default function CashflowDashboard() {
         )}
 
         {/* =========================================================
-            PÁGINA 3: 3. TU PLAN
+            PÁGINA 3: 3. TU PLAN Y GRÁFICA
            ========================================================= */}
         {page === 3 && (
-          <div className="space-y-8">
-            {/* 1. Hero Focal Card: Cuánto apartar cada semana */}
-            <section className="rounded-2xl border-2 border-emerald-600 bg-white p-6 sm:p-8 shadow-2xs space-y-6">
-              <div className="space-y-2">
-                <span className="text-xs font-semibold uppercase tracking-wider text-emerald-700">
-                  Cuánto apartar cada semana
-                </span>
-                <div className="flex flex-wrap items-baseline gap-3">
-                  <span className="text-4xl sm:text-5xl font-bold tracking-tight tabular-nums text-slate-900">
-                    {setAsideDual.primary}
+          <div className="space-y-6">
+            {/* Row 1: 3 Compact Key Metric Cards */}
+            <div className="grid grid-cols-1 gap-4 md:grid-cols-3">
+              {/* Card 1 (Focal): Cuánto apartar cada semana */}
+              <div className="rounded-2xl border-2 border-emerald-600 bg-white p-5 shadow-2xs flex flex-col justify-between space-y-4">
+                <div>
+                  <span className="text-[11px] font-semibold uppercase tracking-wider text-emerald-700">
+                    Apartar cada semana
                   </span>
-                  <span className="text-xl font-semibold tabular-nums text-slate-400">
-                    · {setAsideDual.secondary}
-                  </span>
+                  <div className="mt-1 flex items-baseline gap-2 tabular-nums">
+                    <span className="text-3xl font-bold tracking-tight text-slate-900">
+                      {setAsideDual.primary}
+                    </span>
+                    <span className="text-sm font-semibold text-slate-400">
+                      · {setAsideDual.secondary}
+                    </span>
+                  </div>
                 </div>
-              </div>
 
-              <ul className="space-y-2.5 border-t border-slate-100 pt-5 text-sm text-slate-700 tabular-nums">
-                <li className="flex items-center gap-2.5">
-                  <span className="h-2 w-2 rounded-full bg-emerald-600 shrink-0" />
-                  <span>
-                    En semana buena: aparta{" "}
-                    <strong className="font-semibold text-slate-900">
-                      {formatGTQ(result.seasonLearning.goodWeekSetAsideRuleGTQ)} (
+                <div className="space-y-1.5 border-t border-slate-100 pt-3 text-xs text-slate-600 tabular-nums">
+                  <div className="flex items-center justify-between">
+                    <span>Semana buena:</span>
+                    <span className="font-semibold text-emerald-700">
+                      +{formatGTQ(result.seasonLearning.goodWeekSetAsideRuleGTQ)} (
                       {formatUSD(result.seasonLearning.goodWeekSetAsideRuleUSD)})
-                    </strong>
-                  </span>
-                </li>
-                <li className="flex items-center gap-2.5">
-                  <span className="h-2 w-2 rounded-full bg-amber-500 shrink-0" />
-                  <span>
-                    En temporada baja: toma{" "}
-                    <strong className="font-semibold text-slate-900">
-                      {formatGTQ(result.seasonLearning.lowWeekWithdrawRuleGTQ)} (
+                    </span>
+                  </div>
+                  <div className="flex items-center justify-between">
+                    <span>Temporada baja:</span>
+                    <span className="font-semibold text-amber-700">
+                      -{formatGTQ(result.seasonLearning.lowWeekWithdrawRuleGTQ)} (
                       {formatUSD(result.seasonLearning.lowWeekWithdrawRuleUSD)})
-                    </strong>{" "}
-                    de tu reserva
-                  </span>
-                </li>
-              </ul>
-            </section>
-
-            {/* 2. Two Clean Visual Cards */}
-            <div className="grid grid-cols-1 gap-6 md:grid-cols-2">
-              {/* Tu sueldo seguro */}
-              <div className="rounded-2xl border border-slate-200/80 bg-white p-6 shadow-2xs flex flex-col justify-between space-y-6">
-                <div className="space-y-4">
-                  <h2 className="text-sm font-semibold uppercase tracking-wider text-slate-400">
-                    Tu sueldo seguro
-                  </h2>
-
-                  <div>
-                    <div className="text-xs text-slate-500">Disponible por semana</div>
-                    <div className="mt-1 flex items-baseline gap-2 tabular-nums">
-                      <span className="text-3xl font-bold text-slate-900">
-                        {safeWeeklyDual.primary}
-                      </span>
-                      <span className="text-sm font-medium text-slate-400">
-                        ({safeWeeklyDual.secondary})
-                      </span>
-                    </div>
+                    </span>
                   </div>
-
-                  <div className="border-t border-slate-100 pt-4">
-                    <div className="text-xs text-slate-500">Equivalente mensual</div>
-                    <div className="mt-1 flex items-baseline gap-2 tabular-nums">
-                      <span className="text-2xl font-bold text-emerald-700">
-                        {safeMonthlyDual.primary}
-                      </span>
-                      <span className="text-sm font-medium text-slate-400">
-                        ({safeMonthlyDual.secondary})
-                      </span>
-                    </div>
-                  </div>
-                </div>
-
-                <div className="text-xs text-slate-400">
-                  Lo que puedes gastar con tranquilidad después de apartar tu reserva.
                 </div>
               </div>
 
-              {/* Tus temporadas (Aprendizaje) */}
-              <div className="rounded-2xl border border-slate-200/80 bg-white p-6 shadow-2xs flex flex-col justify-between space-y-5">
+              {/* Card 2: Tu sueldo seguro */}
+              <div className="rounded-2xl border border-slate-200/80 bg-white p-5 shadow-2xs flex flex-col justify-between space-y-4">
+                <div>
+                  <span className="text-[11px] font-semibold uppercase tracking-wider text-slate-400">
+                    Sueldo seguro disponible
+                  </span>
+                  <div className="mt-1 flex items-baseline gap-2 tabular-nums">
+                    <span className="text-3xl font-bold tracking-tight text-slate-900">
+                      {safeWeeklyDual.primary}
+                    </span>
+                    <span className="text-xs font-medium text-slate-400">
+                      / sem ({safeWeeklyDual.secondary})
+                    </span>
+                  </div>
+                </div>
+
+                <div className="space-y-1.5 border-t border-slate-100 pt-3 text-xs tabular-nums">
+                  <div className="flex items-center justify-between">
+                    <span className="text-slate-500">Equivalente mensual:</span>
+                    <span className="font-semibold text-emerald-700">
+                      {safeMonthlyDual.primary} ({safeMonthlyDual.secondary})
+                    </span>
+                  </div>
+                  <div className="flex items-center justify-between">
+                    <span className="text-slate-500">Balance Q / $:</span>
+                    <span className="font-semibold text-slate-800 truncate max-w-[165px]">
+                      {fxPillLabel}
+                    </span>
+                  </div>
+                </div>
+              </div>
+
+              {/* Card 3: Tus temporadas (Barras visuales) */}
+              <div className="rounded-2xl border border-slate-200/80 bg-white p-5 shadow-2xs flex flex-col justify-between space-y-3">
                 <div className="flex items-center justify-between">
-                  <h2 className="text-sm font-semibold uppercase tracking-wider text-slate-400">
-                    Tus temporadas (semanal)
-                  </h2>
-                  <span className="rounded-full bg-emerald-50 px-2.5 py-0.5 text-xs font-semibold text-emerald-700 tabular-nums">
-                    {result.seasonLearning.coverageWeeks} sem. de cobertura
+                  <span className="text-[11px] font-semibold uppercase tracking-wider text-slate-400">
+                    Temporadas (Semanal)
+                  </span>
+                  <span className="rounded-full bg-emerald-50 px-2 py-0.5 text-[11px] font-semibold text-emerald-700 tabular-nums">
+                    {result.seasonLearning.coverageWeeks} sem. reserva
                   </span>
                 </div>
 
-                <div className="space-y-3.5 tabular-nums">
-                  {/* Promedio Temporada Buena */}
+                <div className="space-y-2.5 tabular-nums">
                   <div className="space-y-1">
                     <div className="flex justify-between text-xs">
-                      <span className="font-medium text-slate-600">
-                        Promedio Temporada Buena
-                      </span>
+                      <span className="text-slate-500">Buena</span>
                       <span className="font-semibold text-slate-900">
                         {formatGTQ(result.seasonLearning.goodSeasonWeeklyAvgGTQ)}
                       </span>
                     </div>
-                    <div className="h-2.5 w-full rounded-full bg-slate-100 overflow-hidden">
+                    <div className="h-2 w-full rounded-full bg-slate-100 overflow-hidden">
                       <div
                         className="h-full rounded-full bg-emerald-500"
                         style={{ width: `${goodBarPct}%` }}
@@ -759,15 +743,14 @@ export default function CashflowDashboard() {
                     </div>
                   </div>
 
-                  {/* Gastos Fijos */}
                   <div className="space-y-1">
                     <div className="flex justify-between text-xs">
-                      <span className="font-medium text-slate-600">Gastos Fijos</span>
+                      <span className="text-slate-500">Gastos fijos</span>
                       <span className="font-semibold text-slate-900">
                         {formatGTQ(result.essentialWeeklyGTQ)}
                       </span>
                     </div>
-                    <div className="h-2.5 w-full rounded-full bg-slate-100 overflow-hidden">
+                    <div className="h-2 w-full rounded-full bg-slate-100 overflow-hidden">
                       <div
                         className="h-full rounded-full bg-slate-500"
                         style={{ width: `${essentialBarPct}%` }}
@@ -775,17 +758,14 @@ export default function CashflowDashboard() {
                     </div>
                   </div>
 
-                  {/* Promedio Temporada Baja */}
                   <div className="space-y-1">
                     <div className="flex justify-between text-xs">
-                      <span className="font-medium text-slate-600">
-                        Promedio Temporada Baja
-                      </span>
+                      <span className="text-slate-500">Baja</span>
                       <span className="font-semibold text-slate-900">
                         {formatGTQ(result.seasonLearning.lowSeasonWeeklyAvgGTQ)}
                       </span>
                     </div>
-                    <div className="h-2.5 w-full rounded-full bg-slate-100 overflow-hidden">
+                    <div className="h-2 w-full rounded-full bg-slate-100 overflow-hidden">
                       <div
                         className="h-full rounded-full bg-amber-500"
                         style={{ width: `${lowBarPct}%` }}
@@ -796,201 +776,79 @@ export default function CashflowDashboard() {
               </div>
             </div>
 
-            {/* 3. Compact Bimonetary Strip: 3 clean pills */}
-            <div className="grid grid-cols-1 gap-3 sm:grid-cols-3">
-              <div className="rounded-xl border border-slate-200/80 bg-white px-4 py-3 flex items-center justify-between text-xs tabular-nums">
-                <span className="text-slate-500">Flujo neto en Q</span>
-                <span
-                  className={`font-semibold ${
-                    result.dualCurrency.weeklyNetNativeGTQ >= 0
-                      ? "text-emerald-700"
-                      : "text-amber-700"
-                  }`}
-                >
-                  {result.dualCurrency.weeklyNetNativeGTQ >= 0 ? "+" : ""}
-                  {formatGTQ(result.dualCurrency.weeklyNetNativeGTQ)} / sem
-                </span>
-              </div>
-
-              <div className="rounded-xl border border-slate-200/80 bg-white px-4 py-3 flex items-center justify-between text-xs tabular-nums">
-                <span className="text-slate-500">Flujo neto en $</span>
-                <span
-                  className={`font-semibold ${
-                    result.dualCurrency.weeklyNetNativeUSD >= 0
-                      ? "text-emerald-700"
-                      : "text-amber-700"
-                  }`}
-                >
-                  {result.dualCurrency.weeklyNetNativeUSD >= 0 ? "+" : ""}
-                  {formatUSD(result.dualCurrency.weeklyNetNativeUSD)} / sem
-                </span>
-              </div>
-
-              <div className="rounded-xl border border-slate-200/80 bg-white px-4 py-3 flex items-center justify-between text-xs tabular-nums">
-                <span className="text-slate-500">Cambio sugerido</span>
-                <span className="font-semibold text-slate-900">{fxPillLabel}</span>
-              </div>
-            </div>
-
-            {/* Bottom Navigation */}
-            <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between pt-2">
-              <button
-                type="button"
-                onClick={() => setPage(1)}
-                className="inline-flex items-center gap-2 self-start rounded-xl border border-slate-200 bg-white px-4 py-2.5 text-xs font-semibold text-slate-700 hover:bg-slate-50 transition cursor-pointer"
-              >
-                <ArrowLeft className="h-4 w-4 text-slate-500" />
-                <span>Editar datos</span>
-              </button>
-
-              <button
-                type="button"
-                onClick={() => setPage(4)}
-                className="inline-flex items-center justify-center gap-2 rounded-xl bg-emerald-600 px-6 py-3 text-sm font-semibold text-white shadow-xs hover:bg-emerald-700 transition cursor-pointer"
-              >
-                <span>Ver gráfica y simulador de temporadas</span>
-                <ArrowRight className="h-4 w-4" />
-              </button>
-            </div>
-          </div>
-        )}
-
-        {/* =========================================================
-            PÁGINA 4: 4. GRÁFICA Y SIMULADOR
-           ========================================================= */}
-        {page === 4 && (
-          <div className="space-y-6">
-            <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
-              <div>
-                <h1 className="text-lg sm:text-xl font-semibold text-slate-900">
-                  Ingreso Real vs. Sueldo Estabilizado
-                </h1>
-              </div>
-
-              {/* Quick scenario buttons */}
-              <div className="flex flex-wrap items-center gap-2">
-                <button
-                  type="button"
-                  onClick={() => setSimulationDeltaPct(-30)}
-                  className={`rounded-lg border px-3 py-1.5 text-xs font-semibold transition cursor-pointer ${
-                    simulationDeltaPct === -30
-                      ? "border-rose-300 bg-rose-50 text-rose-700"
-                      : "border-slate-200 bg-white text-slate-600 hover:bg-slate-50"
-                  }`}
-                >
-                  -30% Temporada Baja
-                </button>
-                <button
-                  type="button"
-                  onClick={() => setSimulationDeltaPct(0)}
-                  className={`rounded-lg border px-3 py-1.5 text-xs font-semibold transition cursor-pointer ${
-                    simulationDeltaPct === 0
-                      ? "border-slate-900 bg-slate-900 text-white"
-                      : "border-slate-200 bg-white text-slate-600 hover:bg-slate-50"
-                  }`}
-                >
-                  0% Actual
-                </button>
-                <button
-                  type="button"
-                  onClick={() => setSimulationDeltaPct(30)}
-                  className={`rounded-lg border px-3 py-1.5 text-xs font-semibold transition cursor-pointer ${
-                    simulationDeltaPct === 30
-                      ? "border-sky-300 bg-sky-50 text-sky-800"
-                      : "border-slate-200 bg-white text-slate-600 hover:bg-slate-50"
-                  }`}
-                >
-                  +30% Temporada Alta
-                </button>
-              </div>
-            </div>
-
-            {/* Interactive Slider + 3 Compact Impact Metrics + Chart */}
-            <section className="rounded-2xl border border-slate-200/80 bg-white p-6 shadow-2xs space-y-6">
-              {/* Slider Control */}
-              <div className="flex flex-col gap-3 rounded-xl border border-slate-200/80 bg-[#F8FAFC] p-4 sm:flex-row sm:items-center sm:justify-between">
-                <div className="flex items-center gap-2 text-xs font-semibold text-slate-700">
-                  <SlidersHorizontal className="h-4 w-4 text-emerald-600" />
-                  <span>Simulador de Temporada Baja (-50%) y Alta (+50%)</span>
-                </div>
-
+            {/* Row 2: Interactive Chart + Simulator on the Same Screen */}
+            <section className="rounded-2xl border border-slate-200/80 bg-white p-5 sm:p-6 shadow-2xs space-y-5">
+              <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
                 <div className="flex items-center gap-3">
-                  <span className="text-xs font-medium text-rose-600">-50%</span>
-                  <input
-                    type="range"
-                    min={-50}
-                    max={50}
-                    step={5}
-                    value={simulationDeltaPct}
-                    onChange={(e) => setSimulationDeltaPct(Number(e.target.value))}
-                    className="w-40 sm:w-52 accent-emerald-600 cursor-pointer"
-                  />
-                  <span className="text-xs font-medium text-sky-700">+50%</span>
-                  <span
-                    className={`min-w-[54px] rounded-md px-2 py-1 text-center text-xs font-bold tabular-nums ${
-                      simulationDeltaPct < 0
-                        ? "bg-rose-100 text-rose-700"
-                        : simulationDeltaPct > 0
-                        ? "bg-sky-100 text-sky-800"
-                        : "bg-slate-200 text-slate-700"
+                  <h2 className="text-base font-semibold text-slate-900">
+                    Ingreso Real vs. Sueldo Estabilizado
+                  </h2>
+                  {simulationDeltaPct !== 0 && (
+                    <span
+                      className={`rounded-full px-2.5 py-0.5 text-xs font-semibold tabular-nums ${
+                        simulationDeltaPct < 0
+                          ? "bg-rose-50 text-rose-700 border border-rose-200"
+                          : "bg-sky-50 text-sky-800 border border-sky-200"
+                      }`}
+                    >
+                      Simulando {simulationDeltaPct > 0 ? `+${simulationDeltaPct}%` : `${simulationDeltaPct}%`} ·{" "}
+                      {result.simulation.simulatedCoverageWeeks} sem. cobertura
+                    </span>
+                  )}
+                </div>
+
+                {/* Compact Simulator Controls */}
+                <div className="flex flex-wrap items-center gap-2">
+                  <button
+                    type="button"
+                    onClick={() => setSimulationDeltaPct(-30)}
+                    className={`rounded-lg border px-2.5 py-1 text-xs font-semibold transition cursor-pointer ${
+                      simulationDeltaPct === -30
+                        ? "border-rose-300 bg-rose-50 text-rose-700"
+                        : "border-slate-200 bg-white text-slate-600 hover:bg-slate-50"
                     }`}
                   >
-                    {simulationDeltaPct > 0
-                      ? `+${simulationDeltaPct}%`
-                      : `${simulationDeltaPct}%`}
-                  </span>
-                </div>
-              </div>
-
-              {/* 3 Compact Impact Metrics */}
-              <div className="grid grid-cols-1 gap-3 sm:grid-cols-3 tabular-nums">
-                <div className="rounded-xl border border-slate-200/70 bg-[#F8FAFC] p-3.5">
-                  <div className="text-xs text-slate-500">Ingreso semanal simulado</div>
-                  <div className="mt-1 text-lg font-bold text-slate-900">
-                    {formatGTQ(result.simulation.simulatedWeeklyIncomeGTQ)}{" "}
-                    <span className="text-xs font-medium text-slate-400">
-                      ({formatUSD(result.simulation.simulatedWeeklyIncomeUSD)})
-                    </span>
-                  </div>
-                </div>
-
-                <div className="rounded-xl border border-slate-200/70 bg-[#F8FAFC] p-3.5">
-                  <div className="text-xs text-slate-500">
-                    {result.simulation.weeklyReserveDrawdownGTQ > 0
-                      ? "Retiro semanal de reserva"
-                      : "Ahorro semanal simulado"}
-                  </div>
-                  <div
-                    className={`mt-1 text-lg font-bold ${
-                      result.simulation.weeklyReserveDrawdownGTQ > 0
-                        ? "text-amber-700"
-                        : "text-emerald-700"
+                    -30% Baja
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => setSimulationDeltaPct(0)}
+                    className={`rounded-lg border px-2.5 py-1 text-xs font-semibold transition cursor-pointer ${
+                      simulationDeltaPct === 0
+                        ? "border-slate-900 bg-slate-900 text-white"
+                        : "border-slate-200 bg-white text-slate-600 hover:bg-slate-50"
                     }`}
                   >
-                    {result.simulation.weeklyReserveDrawdownGTQ > 0
-                      ? `-${formatGTQ(result.simulation.weeklyReserveDrawdownGTQ)}`
-                      : `+${formatGTQ(result.simulation.simulatedWeeklySetAsideGTQ)}`}{" "}
-                    <span className="text-xs font-medium text-slate-400">
-                      (
-                      {formatUSD(
-                        result.simulation.weeklyReserveDrawdownGTQ > 0
-                          ? result.simulation.weeklyReserveDrawdownUSD
-                          : result.simulation.simulatedWeeklySetAsideUSD
-                      )}
-                      )
-                    </span>
-                  </div>
-                </div>
+                    Actual
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => setSimulationDeltaPct(30)}
+                    className={`rounded-lg border px-2.5 py-1 text-xs font-semibold transition cursor-pointer ${
+                      simulationDeltaPct === 30
+                        ? "border-sky-300 bg-sky-50 text-sky-800"
+                        : "border-slate-200 bg-white text-slate-600 hover:bg-slate-50"
+                    }`}
+                  >
+                    +30% Alta
+                  </button>
 
-                <div className="rounded-xl border border-slate-200/70 bg-[#F8FAFC] p-3.5">
-                  <div className="text-xs text-slate-500">Cobertura proyectada</div>
-                  <div className="mt-1 text-lg font-bold text-slate-900">
-                    {result.simulation.simulatedCoverageWeeks} semanas
+                  <div className="flex items-center gap-2 pl-1">
+                    <SlidersHorizontal className="h-3.5 w-3.5 text-slate-400" />
+                    <input
+                      type="range"
+                      min={-50}
+                      max={50}
+                      step={5}
+                      value={simulationDeltaPct}
+                      onChange={(e) => setSimulationDeltaPct(Number(e.target.value))}
+                      aria-label="Simular temporada baja o alta"
+                      className="w-28 sm:w-36 accent-emerald-600 cursor-pointer"
+                    />
                   </div>
                 </div>
               </div>
 
-              {/* Chart */}
               <CashflowChart
                 data={result.evaluatedPeriods}
                 periodFloorGTQ={
@@ -1004,14 +862,14 @@ export default function CashflowDashboard() {
               />
             </section>
 
-            <div className="flex items-center justify-between pt-2">
+            <div className="flex items-center justify-between">
               <button
                 type="button"
-                onClick={() => setPage(3)}
-                className="inline-flex items-center gap-2 rounded-xl border border-slate-200 bg-white px-4 py-2.5 text-xs font-semibold text-slate-700 hover:bg-slate-50 transition cursor-pointer"
+                onClick={() => setPage(1)}
+                className="inline-flex items-center gap-2 rounded-xl border border-slate-200 bg-white px-4 py-2 text-xs font-semibold text-slate-700 hover:bg-slate-50 transition cursor-pointer"
               >
                 <ArrowLeft className="h-4 w-4 text-slate-500" />
-                <span>Volver a tu plan</span>
+                <span>Editar ingresos y gastos</span>
               </button>
             </div>
           </div>

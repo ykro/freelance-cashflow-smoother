@@ -12,12 +12,11 @@
 
 Los trabajadores independientes, comerciantes informales y freelancers sufren por la **asimetria estacional**: en los periodos de cosecha alta gastan como si el ingreso extraordinario fuera permanente, y cuando llega la temporada baja recurren a deuda para cubrir sus gastos fijos.
 
-**Estabilizador** organiza el presupuesto en **4 paginas** (`1. Ingresos` · `2. Gastos` · `3. Tu Plan` · `4. Grafica y Simulador`) con soporte en Quetzales (`Q`) y Dolares (`$`):
+**Estabilizador** organiza el presupuesto en **3 pantallas** (`1. Ingresos` · `2. Gastos` · `3. Tu Plan`) con soporte en Quetzales (`Q`) y Dolares (`$`):
 
 1. **1. Ingresos:** Captura de los ultimos meses (`Por Mes`) o semanas (`Por Semana`) en `Q` y `$`, clasificando cada periodo como `Alta`, `Normal` o `Baja`.
 2. **2. Gastos:** Registro de gastos esenciales fijos y reserva disponible actual en `Q` y `$`.
-3. **3. Tu Plan:** Calculo directo de cuanto apartar cada semana, sueldo seguro semanal/mensual, comparativa visual de temporadas y flujo neto por moneda.
-4. **4. Grafica y Simulador:** Comparativa entre ingreso real y sueldo estabilizado con simulador de temporada baja (`-50%`) y temporada alta (`+50%`).
+3. **3. Tu Plan:** Combina en una sola vista las metricas clave (`Apartar cada semana`, `Sueldo seguro disponible` y comparativa de temporadas) junto con la grafica interactiva `Ingreso Real vs. Sueldo Estabilizado` y el simulador de temporada baja (`-50%`) y alta (`+50%`).
 
 ---
 
@@ -29,8 +28,7 @@ Los trabajadores independientes, comerciantes informales y freelancers sufren po
 | :--- | :--- | :--- |
 | **1. Ingresos** | Selector `Por Mes` / `Por Semana`, 3 perfiles de ejemplo y lista de periodos (`Q` y `$`) | Registra ingresos historicos y detecta automaticamente si cada periodo fue `Alta`, `Normal` o `Baja`. |
 | **2. Gastos** | Tarjetas de `Gastos esenciales fijos` y `Reserva disponible hoy` (`Q` y `$`) | Define el piso de gastos fijos y el colchon disponible. |
-| **3. Tu Plan** | Meta semanal a apartar, sueldo seguro, barras de aprendizaje estacional y tira bimonetaria | Indica cuanto guardar en semana buena, cuanto retirar en temporada baja y cuanto puedes gastar de forma estable. |
-| **4. Grafica y Simulador** | Grafica `CashflowChart` y control deslizante de `-50%` a `+50%` | Simula caidas o subidas de ingresos y su impacto en la cobertura de semanas. |
+| **3. Tu Plan** | Metricas de ahorro semanal, sueldo seguro, barras de temporadas, grafica `CashflowChart` y simulador (`-50%` a `+50%`) | Muestra en la misma pantalla cuanto apartar cada semana, el sueldo estable y la grafica interactiva de ingreso real frente a estabilizado. |
 
 ---
 
