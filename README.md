@@ -38,6 +38,14 @@ Los trabajadores independientes, comerciantes informales y freelancers sufren po
 
 ---
 
+## Temas para Artículos Técnicos y de Producto
+
+1. **Algoritmos de suavizado estacional de ingresos para trabajadores independientes y economía informal:** Cómo modelar la asimetría entre semanas o meses de cosecha alta y temporada baja para calcular automáticamente cuánto apartar en los períodos buenos y cuál es el sueldo seguro disponible sin caer en endeudamiento.
+2. **Presupuestos bimonetarios nativos (`GTQ Q` y `USD $`) en mercados latinoamericanos:** Por qué las herramientas de presupuesto de una sola moneda fallan cuando conviven ingresos en dólares (contratos remotos, exportaciones o remesas) con gastos esenciales en moneda local, y cómo diseñar un motor financiero que opere ambas monedas en paralelo.
+3. **Diseño de interfaces financieras de baja fricción — De hojas de cálculo complejas a un flujo de 3 pantallas con simulación en vivo:** Cómo separar la captura de ingresos y gastos de la vista de decisión (`Tu Plan`), integrando en una sola pantalla las métricas esenciales y la gráfica interactiva de ingreso real frente a sueldo estabilizado con simulación de caídas y subidas (`-50%` a `+50%`).
+
+---
+
 ## Desarrollo Local
 
 ```bash
